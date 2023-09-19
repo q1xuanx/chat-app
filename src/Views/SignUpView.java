@@ -36,6 +36,8 @@ public class SignUpView extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jTextField2 = new javax.swing.JTextField();
+        jTextField4 = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -48,9 +50,15 @@ public class SignUpView extends javax.swing.JFrame {
         txtName = new javax.swing.JTextField();
         btnNam = new javax.swing.JRadioButton();
         btnNu = new javax.swing.JRadioButton();
-        txtngaysinh = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        txtdate = new javax.swing.JTextField();
+        txtyear = new javax.swing.JTextField();
+        txtmonth = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+
+        jTextField2.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sign up ");
@@ -85,8 +93,6 @@ public class SignUpView extends javax.swing.JFrame {
         btnNu.setBackground(new java.awt.Color(255, 153, 0));
         btnNu.setText("Nữ");
 
-        txtngaysinh.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 153, 0), 2, true));
-
         jButton1.setText("Sign Up");
         jButton1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -103,6 +109,19 @@ public class SignUpView extends javax.swing.JFrame {
             }
         });
 
+        txtdate.setText("Date");
+        txtdate.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 153, 0), 2));
+
+        txtyear.setText("Year");
+        txtyear.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 153, 0), 2));
+
+        txtmonth.setText("Month");
+        txtmonth.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 153, 0), 2));
+
+        jLabel7.setText("-");
+
+        jLabel8.setText("-");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -110,27 +129,38 @@ public class SignUpView extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(39, 39, 39)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel2)
-                            .addComponent(txtGmail, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
-                            .addComponent(jLabel3)
-                            .addComponent(txtpass)
-                            .addComponent(jLabel5)
-                            .addComponent(txtName)
-                            .addComponent(jLabel6)
-                            .addComponent(txtngaysinh)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(btnNam, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnNu, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(65, 65, 65)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(45, 45, 45)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(45, Short.MAX_VALUE))
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(39, 39, 39)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jLabel4)
+                                .addComponent(jLabel2)
+                                .addComponent(txtGmail, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+                                .addComponent(jLabel3)
+                                .addComponent(txtpass)
+                                .addComponent(jLabel5)
+                                .addComponent(txtName)
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addComponent(btnNam, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnNu, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(txtdate)
+                                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel8)
+                                .addGap(12, 12, 12)
+                                .addComponent(txtmonth, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel7)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtyear, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(59, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(jLabel1)
@@ -162,7 +192,12 @@ public class SignUpView extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtngaysinh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtdate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtyear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtmonth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel8))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -185,26 +220,31 @@ public class SignUpView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if (btnNam.isSelected() && btnNu.isSelected()){
-            JOptionPane.showMessageDialog(null,"Bạn không thể chọn 2 giới tính");
+        if (btnNam.isSelected() && btnNu.isSelected()) {
+            JOptionPane.showMessageDialog(null, "Bạn không thể chọn 2 giới tính");
             btnNam.setSelected(false);
             btnNu.setSelected(false);
         }
         String gioiTinh = "Nu";
-        if (btnNam.isSelected()) gioiTinh = "Nam";
+        if (btnNam.isSelected()) {
+            gioiTinh = "Nam";
+        }
         RegisterModels regis = new RegisterModels();
         String pass = "";
+        String txtngaysinh = txtdate.getText() + "-" + txtmonth.getText() + "-" + txtyear.getText();
         try {
             pass = Utils.encryptPassword(txtpass.getText());
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(SignUpView.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            int resgister = regis.registerConnect(txtGmail.getText(),pass,txtName.getText(), gioiTinh, txtngaysinh.getText());
-            if (resgister == 1){
-                JOptionPane.showMessageDialog(null,"Đăng ký thành công");
-            }else {
-                JOptionPane.showMessageDialog(null,"Đăng ký thất bại");
+            int resgister = regis.registerConnect(txtGmail.getText(), pass, txtName.getText(), gioiTinh, txtngaysinh.trim());
+            if (resgister == 1) {
+                JOptionPane.showMessageDialog(null, "Đăng ký thành công");
+                setNull();
+            } else {
+                JOptionPane.showMessageDialog(null, "Đăng ký thất bại");
+                setNull();
             }
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(SignUpView.class.getName()).log(Level.SEVERE, null, ex);
@@ -214,7 +254,17 @@ public class SignUpView extends javax.swing.JFrame {
             Logger.getLogger(SignUpView.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+    public void setNull() {
+        txtGmail.setText("");
+        txtpass.setText("");
+        txtName.setText("");
+        btnNam.setSelected(false);
+        btnNu.setSelected(false);
+        txtdate.setText("");
+        txtmonth.setText("");
+        txtyear.setText("");
 
+    }
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -265,10 +315,16 @@ public class SignUpView extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField txtGmail;
     private javax.swing.JTextField txtName;
-    private javax.swing.JTextField txtngaysinh;
+    private javax.swing.JTextField txtdate;
+    private javax.swing.JTextField txtmonth;
     private javax.swing.JPasswordField txtpass;
+    private javax.swing.JTextField txtyear;
     // End of variables declaration//GEN-END:variables
 }

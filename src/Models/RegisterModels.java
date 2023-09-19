@@ -21,8 +21,8 @@ public class RegisterModels {
 
     public int registerConnect(String username, String password, String hoTen, String gioiTinh, String ngaySinh) throws ClassNotFoundException, SQLException, ParseException {
         DBAccess db = new DBAccess();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        Date date = sdf.parse(ngaySinh);
+        //SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        Date date = new SimpleDateFormat("dd-MM-yyyy").parse(ngaySinh);
         java.sql.Date sqlDate = new java.sql.Date(date.getTime());
         System.out.println(sqlDate);
         int gioitinh = 0;
