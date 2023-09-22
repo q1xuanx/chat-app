@@ -22,8 +22,10 @@ public class ServerControls {
     public DataInputStream in; 
     public ServerControls() throws IOException{
         startServer(7777);
-        //acceptClient();
-        
+        System.out.println("server start");
+        while(true){
+            
+        }
     }
     public void startServer(int port) throws IOException{
         sv = new ServerSocket(port);

@@ -42,8 +42,6 @@ public class ClientView extends javax.swing.JFrame {
 
         txtmessage = new javax.swing.JTextField();
         btnsend = new javax.swing.JButton();
-        left = new javax.swing.JPanel();
-        right = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -54,56 +52,21 @@ public class ClientView extends javax.swing.JFrame {
             }
         });
 
-        left.setBackground(new java.awt.Color(204, 255, 255));
-
-        javax.swing.GroupLayout leftLayout = new javax.swing.GroupLayout(left);
-        left.setLayout(leftLayout);
-        leftLayout.setHorizontalGroup(
-            leftLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 262, Short.MAX_VALUE)
-        );
-        leftLayout.setVerticalGroup(
-            leftLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 361, Short.MAX_VALUE)
-        );
-
-        right.setBackground(new java.awt.Color(204, 255, 255));
-
-        javax.swing.GroupLayout rightLayout = new javax.swing.GroupLayout(right);
-        right.setLayout(rightLayout);
-        rightLayout.setHorizontalGroup(
-            rightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 262, Short.MAX_VALUE)
-        );
-        rightLayout.setVerticalGroup(
-            rightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(txtmessage)
+                .addComponent(txtmessage, javax.swing.GroupLayout.DEFAULT_SIZE, 457, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnsend))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(left, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(right, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(54, 54, 54)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(left, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(right, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addContainerGap(433, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtmessage, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtmessage, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnsend)))
         );
 
@@ -111,12 +74,7 @@ public class ClientView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
     ClientsControls cl;
     private void btnsendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnsendActionPerformed
-        String msg = txtmessage.getText();
-        JPanel tmp = formatLabel(msg);
-        right.setLayout(new BorderLayout());
-        right.add(tmp,BorderLayout.LINE_END);
-        right.revalidate();
-        right.validate();
+
     }//GEN-LAST:event_btnsendActionPerformed
     public JPanel formatLabel(String s){
         JPanel panel = new JPanel();
@@ -164,8 +122,6 @@ public class ClientView extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnsend;
-    private javax.swing.JPanel left;
-    private javax.swing.JPanel right;
     private javax.swing.JTextField txtmessage;
     // End of variables declaration//GEN-END:variables
 }

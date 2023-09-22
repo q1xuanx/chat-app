@@ -234,8 +234,8 @@ public class LoginViews extends javax.swing.JFrame {
             boolean checkUser = lm.loginToChat(txtusername.getText(), hash);
             System.out.println(hash);
             if (checkUser){
-                ClientView cl = new ClientView();
-                cl.setVisible(true);
+                MainViews fr = new MainViews();
+                fr.setVisible(true);
                 this.hide();
             }else {
                 JOptionPane.showMessageDialog(null,"Sai tên tài khoản hoặc mật khẩu");
