@@ -42,6 +42,8 @@ public class ClientView extends javax.swing.JFrame {
 
         txtmessage = new javax.swing.JTextField();
         btnsend = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txtdisplay = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -52,6 +54,13 @@ public class ClientView extends javax.swing.JFrame {
             }
         });
 
+        txtdisplay.setEditable(false);
+        txtdisplay.setColumns(20);
+        txtdisplay.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        txtdisplay.setRows(5);
+        txtdisplay.setEnabled(false);
+        jScrollPane1.setViewportView(txtdisplay);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -60,11 +69,14 @@ public class ClientView extends javax.swing.JFrame {
                 .addComponent(txtmessage, javax.swing.GroupLayout.DEFAULT_SIZE, 457, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnsend))
+            .addComponent(jScrollPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(433, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtmessage, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnsend)))
@@ -74,7 +86,10 @@ public class ClientView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
     ClientsControls cl;
     private void btnsendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnsendActionPerformed
-
+        String msg = txtmessage.getText();
+        txtdisplay.append(msg + "\n");
+        //txtdisplay.setAlignmentX((float) 10);
+        txtmessage.setText(null);
     }//GEN-LAST:event_btnsendActionPerformed
     public JPanel formatLabel(String s){
         JPanel panel = new JPanel();
@@ -122,6 +137,8 @@ public class ClientView extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnsend;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea txtdisplay;
     private javax.swing.JTextField txtmessage;
     // End of variables declaration//GEN-END:variables
 }
