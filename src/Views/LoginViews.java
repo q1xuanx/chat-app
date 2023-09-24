@@ -7,6 +7,10 @@ package Views;
 
 import Controls.Utils;
 import Models.LoginModels;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -22,6 +26,11 @@ public class LoginViews extends javax.swing.JFrame {
     /**
      * Creates new form LoginViews
      */
+    
+    Socket client; 
+    DataInputStream in;
+    DataOutputStream out;
+    
     public LoginViews() {
         initComponents();
     }
@@ -232,17 +241,18 @@ public class LoginViews extends javax.swing.JFrame {
         }
         try {
             boolean checkUser = lm.loginToChat(txtusername.getText(), hash);
-            System.out.println(hash);
             if (checkUser){
-                MainViews fr = new MainViews();
+                client = new Socket("localhost",7777);
+                in = new DataInputStream(client.getInputStream());
+                out = new DataOutputStream(client.getOutputStream());
+                out.writeUTF(txtusername.getText());
+                MainViews fr = new MainViews(client,txtusername.getText());
                 fr.setVisible(true);
                 this.hide();
             }else {
                 JOptionPane.showMessageDialog(null,"Sai tên tài khoản hoặc mật khẩu");
             }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(LoginViews.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
+        } catch (ClassNotFoundException | SQLException | IOException ex) {
             Logger.getLogger(LoginViews.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed

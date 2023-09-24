@@ -16,20 +16,12 @@ import java.util.Scanner;
  * @author Admin
  */
 public class ClientsControls {
-    public Socket client; 
-    public DataInputStream input;
-    public DataOutputStream output;
+    private static Socket client; 
+    private static DataInputStream input;
+    private static DataOutputStream output;
     
-    public void joinServer(String message) throws IOException{
-        client = new Socket("localhost",7777);
+    public String readMessage(Socket client, String msg) throws IOException{
         input = new DataInputStream(client.getInputStream());
-        output = new DataOutputStream(client.getOutputStream());
-        output.writeUTF(message);
-    }
-    public void SendMessage(String s) throws IOException{
-        output.writeUTF(s);
-    }
-    public String ReceiveMessage() throws IOException{
         return input.readUTF();
     }
 }
