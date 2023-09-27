@@ -5,6 +5,7 @@
  */
 package Views;
 
+import Controls.ClientsControls.ServerHandler;
 import Controls.ServerControls;
 import java.awt.CardLayout;
 import java.awt.LayoutManager;
@@ -12,7 +13,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
@@ -28,16 +33,17 @@ public class MainViews extends javax.swing.JFrame {
      * Creates new form FriendListViews
      */
     static Socket socket;
-    DataInputStream in;
-    DataOutputStream out;
+    static DataInputStream in;
+    static DataOutputStream out;
     static String username = "";
-    
-    public MainViews(Socket socket, String username) throws IOException {
+    static LoginViews lg;
+
+    public MainViews(Socket socket, String username, LoginViews lg) throws IOException {
         initComponents();
         this.socket = socket;
         this.username = username;
+        this.lg = lg;
         PanelDisplay.setSelectedIndex(0);
-        DefaultListModel ls = new ServerControls(username).getUserInMap(username);
     }
 
     /**
@@ -54,6 +60,7 @@ public class MainViews extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
         PanelDisplay = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
@@ -67,12 +74,13 @@ public class MainViews extends javax.swing.JFrame {
         userOnline = new javax.swing.JList<>();
         jPanel8 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
-        labelname = new javax.swing.JLabel();
+        userSend = new javax.swing.JLabel();
         txtmessagesend = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        displayMessage = new javax.swing.JTextArea();
+        jButton3 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -103,6 +111,14 @@ public class MainViews extends javax.swing.JFrame {
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-group-35.png"))); // NOI18N
 
+        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-log-out-35.png"))); // NOI18N
+        jLabel7.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel7MouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -111,6 +127,7 @@ public class MainViews extends javax.swing.JFrame {
             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -123,7 +140,9 @@ public class MainViews extends javax.swing.JFrame {
                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(287, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 212, Short.MAX_VALUE)
+                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 649));
@@ -195,11 +214,6 @@ public class MainViews extends javax.swing.JFrame {
 
         userOnline.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         userOnline.setFont(new java.awt.Font("Tahoma", 0, 22)); // NOI18N
-        userOnline.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         userOnline.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 userOnlineMouseClicked(evt);
@@ -224,20 +238,20 @@ public class MainViews extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 492, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
-        jPanel5.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(28, 16, -1, 600));
+        jPanel5.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(28, 16, -1, 610));
 
         jPanel8.setBackground(new java.awt.Color(255, 255, 255));
         jPanel8.setPreferredSize(new java.awt.Dimension(660, 614));
 
         jPanel9.setBackground(new java.awt.Color(255, 204, 153));
 
-        labelname.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        labelname.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        labelname.setText("None");
+        userSend.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        userSend.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        userSend.setText("None");
 
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
@@ -245,12 +259,12 @@ public class MainViews extends javax.swing.JFrame {
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addGap(57, 57, 57)
-                .addComponent(labelname, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(userSend, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(labelname, javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
+            .addComponent(userSend, javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
         );
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-send-30.png"))); // NOI18N
@@ -262,10 +276,10 @@ public class MainViews extends javax.swing.JFrame {
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-send-file-30.png"))); // NOI18N
 
-        jTextArea1.setEditable(false);
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane2.setViewportView(jTextArea1);
+        displayMessage.setEditable(false);
+        displayMessage.setColumns(20);
+        displayMessage.setRows(5);
+        jScrollPane2.setViewportView(displayMessage);
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
@@ -299,6 +313,15 @@ public class MainViews extends javax.swing.JFrame {
 
         jPanel5.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 20, 660, 600));
 
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-reload-20.png"))); // NOI18N
+        jButton3.setBorder(null);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 110, 60, 40));
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -331,19 +354,39 @@ public class MainViews extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 //Call form chat 1 - 1
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-       PanelDisplay.setSelectedIndex(1);
+        PanelDisplay.setSelectedIndex(1);
+        //JOptionPane.showMessageDialog(this, "Hello i'm here");
+        try {
+            in = new DataInputStream(socket.getInputStream());
+            out = new DataOutputStream(socket.getOutputStream());
+            String opt = "get_user_online";
+            out.writeUTF(opt);
+            int sizeOfMap = Integer.parseInt(in.readUTF());
+            DefaultListModel ls = new DefaultListModel();
+            while (sizeOfMap > 0) {
+                ls.addElement(in.readUTF());
+                sizeOfMap--;
+            }
+            ls.removeElement(username);
+            userOnline.setModel(ls);
+        } catch (IOException ex) {
+            Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jLabel1MouseClicked
+    public void addMessageToPanel(String message) {
+        displayMessage.append(message);
+    }
 //Call form main
     private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
         PanelDisplay.setSelectedIndex(0);
     }//GEN-LAST:event_jLabel3MouseClicked
 //Display user can chat with 
     private void userOnlineMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_userOnlineMouseClicked
-        labelname.setText(userOnline.getSelectedValue());
+        userSend.setText(userOnline.getSelectedValue());
     }//GEN-LAST:event_userOnlineMouseClicked
 
     private void txtfindnameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtfindnameActionPerformed
-        if (txtfindname.getText().equals("")){
+        if (txtfindname.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "Please fill the text box to find user");
             return;
         }
@@ -358,13 +401,55 @@ public class MainViews extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
             out = new DataOutputStream(socket.getOutputStream());
+            String choice = "send_message";
+            out.writeUTF(choice);
+            out.writeUTF(userSend.getText());
             out.writeUTF(txtmessagesend.getText());
             out.flush();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            LocalDateTime date = LocalDateTime.now();
+            String curdate = date.format(formatter);
+            displayMessage.append(username + ": " + txtmessagesend.getText() + "\n" + curdate);
         } catch (IOException ex) {
             Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
         }
-      
+
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jLabel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseClicked
+        int ask = JOptionPane.showConfirmDialog(this, "Do you want log out ?");
+        if (ask == 0) {
+            String opt = "user_out";
+            try {
+                out = new DataOutputStream(socket.getOutputStream());
+                out.writeUTF(opt);
+                out.writeUTF(username);
+                this.dispose();
+                lg.setVisible(true);
+            } catch (IOException ex) {
+                Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_jLabel7MouseClicked
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        try {
+            in = new DataInputStream(socket.getInputStream());
+            out = new DataOutputStream(socket.getOutputStream());
+            String opt = "get_user_online";
+            out.writeUTF(opt);
+            int sizeOfMap = Integer.parseInt(in.readUTF());
+            DefaultListModel ls = new DefaultListModel();
+            while (sizeOfMap > 0) {
+                ls.addElement(in.readUTF());
+                sizeOfMap--;
+            }
+            ls.removeElement(username);
+            userOnline.setModel(ls);
+        } catch (IOException ex) {
+            Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -395,7 +480,7 @@ public class MainViews extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new MainViews(socket,username).setVisible(true);
+                    new MainViews(socket, username, lg).setVisible(true);
                 } catch (IOException ex) {
                     Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -405,14 +490,17 @@ public class MainViews extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane PanelDisplay;
+    private javax.swing.JTextArea displayMessage;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -424,10 +512,9 @@ public class MainViews extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JLabel labelname;
     private javax.swing.JTextField txtfindname;
     private javax.swing.JTextField txtmessagesend;
     private javax.swing.JList<String> userOnline;
+    private javax.swing.JLabel userSend;
     // End of variables declaration//GEN-END:variables
 }

@@ -17,6 +17,6 @@ public class ServerView {
     static final int port = 7777;
 
     public static void main(String args[]) throws IOException {
-        
+        ServerControls sv = new ServerControls();
     }
 }

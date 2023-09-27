@@ -243,10 +243,9 @@ public class LoginViews extends javax.swing.JFrame {
             boolean checkUser = lm.loginToChat(txtusername.getText(), hash);
             if (checkUser){
                 client = new Socket("localhost",7777);
-                in = new DataInputStream(client.getInputStream());
                 out = new DataOutputStream(client.getOutputStream());
                 out.writeUTF(txtusername.getText());
-                MainViews fr = new MainViews(client,txtusername.getText());
+                MainViews fr = new MainViews(client,txtusername.getText(),this);
                 fr.setVisible(true);
                 this.hide();
             }else {
@@ -256,7 +255,7 @@ public class LoginViews extends javax.swing.JFrame {
             Logger.getLogger(LoginViews.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
-
+    
     /**
      * @param args the command line arguments
      */

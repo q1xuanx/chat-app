@@ -10,18 +10,40 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Admin
  */
 public class ClientsControls {
-    private static Socket client; 
-    private static DataInputStream input;
-    private static DataOutputStream output;
-    
-    public String readMessage(Socket client, String msg) throws IOException{
-        input = new DataInputStream(client.getInputStream());
-        return input.readUTF();
+
+    public static class ServerHandler implements Runnable {
+
+        private Socket client;
+        DataOutputStream out;
+        DataInputStream in;
+
+        public ServerHandler(Socket client) {
+            this.client = client;
+        }
+
+        @Override
+        public void run() {
+            try {
+                if (in.readUTF() != null) {
+                    String choice = in.readUTF();
+                    switch (choice) {
+                        case "receive_msg":
+                            in = new DataInputStream(client.getInputStream());
+                            String msg = in.readUTF();
+                    }
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(ClientsControls.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
     }
 }
