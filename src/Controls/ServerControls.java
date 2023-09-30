@@ -45,7 +45,7 @@ public class ServerControls {
             in = new DataInputStream(client.getInputStream());
             out = new DataOutputStream(client.getOutputStream());
             String username = in.readUTF();
-            System.out.println("[LOG]"+ username + " has login to server");
+            System.out.println("[LOG]" + username + " has login to server");
             mp.put(username, client);
             HandleClient hc = new HandleClient(client, in, out);
             Thread t = new Thread(hc);
@@ -66,6 +66,7 @@ public class ServerControls {
         private DataInputStream in;
         private DataOutputStream out;
         private MainViews mv;
+
         public HandleClient(Socket client, DataInputStream in, DataOutputStream out) {
             this.client = client;
             this.in = in;
@@ -82,7 +83,6 @@ public class ServerControls {
                             case "send_message":
                                 String userToSend = in.readUTF();
                                 String msg = in.readUTF();
-                                System.out.println("Message: " + msg);
                                 Socket temp = null;
                                 for (Map.Entry<String, Socket> en : mp.entrySet()) {
                                     if (en.getKey().equals(userToSend)) {
@@ -90,13 +90,12 @@ public class ServerControls {
                                         break;
                                     }
                                 }
-                                if (temp == null) {
-                                    out.writeUTF("User not found !");
-                                    break;
-                                }
-                                sendMessage(msg, temp);
+                                String userSend = in.readUTF();
+                                sendMessage(msg, userSend, temp);
                                 break;
                             case "get_user_online":
+                                String action = "get_user_online";
+                                out.writeUTF(action);
                                 int sizeOfMap = mp.size();
                                 out.writeUTF(String.valueOf(sizeOfMap));
                                 for (Map.Entry<String, Socket> m : mp.entrySet()) {
@@ -109,13 +108,27 @@ public class ServerControls {
                                 System.out.println("[LOG]" + username + " has left");
                                 mp.remove(username);
                                 client.close();
+                                out.writeUTF("kill_thread");
+                                break;
+                            case "send_request_friend":
+                                String userNeedToSend = in.readUTF();
+                                Socket clientNeedToSend = null;
+                                for (Map.Entry<String, Socket> m : mp.entrySet()){
+                                    if (m.getKey().equals(userNeedToSend)){
+                                        clientNeedToSend = m.getValue();
+                                        break;
+                                    }
+                                }
+                                String userSended = in.readUTF();
+                                sendRequestFriend(clientNeedToSend,"receive_request", userSended);
                                 break;
                             default:
 
                                 break;
                         }
-                    }else {
+                    } else {
                         sv.close();
+                        break;
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(ServerControls.class.getName()).log(Level.SEVERE, null, ex);
@@ -124,10 +137,20 @@ public class ServerControls {
         }
 
         //Send to user
-        public void sendMessage(String msg, Socket s) throws IOException {
+        public void sendMessage(String msg, String userToSend, Socket s) throws IOException {
             DataOutputStream out = new DataOutputStream(s.getOutputStream());
+            String action = "receive_msg";
+            out.writeUTF(action);
+            out.writeUTF(userToSend);
             out.writeUTF(msg);
-        }   
+            String note = "Bạn có tin nhắn mới từ: " + userToSend;
+            out.writeUTF(note);
+        }
+        public void sendRequestFriend(Socket s, String action, String userSend) throws IOException{
+            DataOutputStream out = new DataOutputStream(s.getOutputStream());
+            out.writeUTF(action);
+            out.writeUTF(userSend);
+        }
     }
 
     public class ServerService implements Runnable {
