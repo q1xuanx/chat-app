@@ -20,6 +20,9 @@ public class DBAccess {
     private Connection con;
     private Statement stmt;
    
+    public void DBAccess() throws SQLException{
+        Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+    }
     public DBAccess() throws ClassNotFoundException, SQLException{
         try{
         DBConnection db = new DBConnection();

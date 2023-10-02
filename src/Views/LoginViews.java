@@ -5,7 +5,8 @@
  */
 package Views;
 
-import Controls.Utils;
+import Controls.LoginControls;
+import Controls.HashControls;
 import Models.LoginModels;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -232,15 +233,15 @@ public class LoginViews extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        LoginModels lm = new LoginModels();
+        LoginControls lm = new LoginControls();
         String hash = "";
         try {
-            hash = Utils.encryptPassword(txtpassword.getText());
+            hash = HashControls.encryptPassword(txtpassword.getText());
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(LoginViews.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            boolean checkUser = lm.loginToChat(txtusername.getText(), hash);
+            boolean checkUser = lm.checkLogin(txtusername.getText(), hash);
             if (checkUser){
                 client = new Socket("localhost",7777);
                 out = new DataOutputStream(client.getOutputStream());

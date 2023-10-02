@@ -11,10 +11,16 @@ import Views.LoginViews;
 import Views.MainViews;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URL;
+import java.nio.file.Path;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -91,7 +97,17 @@ public class ServerControls {
                                     }
                                 }
                                 String userSend = in.readUTF();
-                                sendMessage(msg, userSend, temp);
+                                String curdate = in.readUTF();
+                                StoreMsgControls addDB = new StoreMsgControls();
+                                String IDCHAT = addDB.checkChat(userSend, userToSend);
+                                if (!IDCHAT.equals("")) {
+                                    addDB.storeMess(IDCHAT, userSend, msg, curdate);
+                                } else {
+                                    addDB.addNewChat(userSend, userToSend);
+                                    String ID = addDB.checkChat(userSend, userToSend);
+                                    addDB.storeMess(ID, userSend, msg, curdate);
+                                }
+                                sendMessage(msg, userSend, temp, curdate);
                                 break;
                             case "get_user_online":
                                 String action = "get_user_online";
@@ -100,7 +116,6 @@ public class ServerControls {
                                 out.writeUTF(String.valueOf(sizeOfMap));
                                 for (Map.Entry<String, Socket> m : mp.entrySet()) {
                                     out.writeUTF(m.getKey());
-                                    System.out.println(m.getKey());
                                 }
                                 break;
                             case "user_out":
@@ -113,14 +128,81 @@ public class ServerControls {
                             case "send_request_friend":
                                 String userNeedToSend = in.readUTF();
                                 Socket clientNeedToSend = null;
-                                for (Map.Entry<String, Socket> m : mp.entrySet()){
-                                    if (m.getKey().equals(userNeedToSend)){
+                                for (Map.Entry<String, Socket> m : mp.entrySet()) {
+                                    if (m.getKey().equals(userNeedToSend)) {
                                         clientNeedToSend = m.getValue();
                                         break;
                                     }
                                 }
                                 String userSended = in.readUTF();
-                                sendRequestFriend(clientNeedToSend,"receive_request", userSended);
+                                sendRequestFriend(clientNeedToSend, "receive_request", userSended);
+                                break;
+                            case "send_file":
+                                String senduser = in.readUTF();
+                                Socket receiveFile = null;
+                                for (Map.Entry<String, Socket> m : mp.entrySet()) {
+                                    if (m.getKey().equals(senduser)) {
+                                        receiveFile = m.getValue();
+                                        break;
+                                    }
+                                }
+                                int bytes = 0;
+                                StoreMsgControls storeFile = new StoreMsgControls();
+                                long sizeOfFile = in.readLong();
+                                String fileName = in.readUTF();
+                                String curdat = in.readUTF();
+                                String usersend = in.readUTF();
+                                String check = storeFile.checkChat(senduser, usersend);
+                                String path = "C:/Users/Admin/Desktop/ChatApp/ChatApplication/src/FileSave/Files/" + fileName;
+                                File file = new File(path);
+                                FileOutputStream save = new FileOutputStream(file);
+                                byte[] buffer = new byte[4 * 1024];
+                                while (sizeOfFile > 0 && (bytes = in.read(buffer, 0, (int) Math.min(buffer.length, sizeOfFile))) != -1) {
+                                    save.write(buffer, 0, bytes);
+                                    sizeOfFile -= bytes;
+                                }
+                                Path filePath = file.toPath();
+                                URL urlfile = filePath.toUri().toURL();
+                                if (!check.equals("")) {
+                                    storeFile.storeMess(check, usersend,"[FILE] " + urlfile.toString(),curdat);
+                                } else {
+                                    storeFile.addNewChat(usersend, senduser);
+                                    String ID = storeFile.checkChat(usersend, senduser);
+                                    storeFile.storeMess(ID, usersend,"[FILE] " + urlfile.toString(), curdat);
+                                }
+                                String fileSend = file.getName();
+                                sendFile(usersend, receiveFile, fileSend, curdat, "receive_file", urlfile.toString());
+                                break;
+                            case "send_old_message":
+                                String username1 = in.readUTF();
+                                String username2 = in.readUTF();
+                                StoreMsgControls sendOldMsg = new StoreMsgControls();
+                                String s = sendOldMsg.checkChat(username1, username2);
+                                if (!s.equals("")) {
+                                    out.writeUTF("receive_old_message");
+                                    ResultSet res = sendOldMsg.takeOldMessage(s);
+                                    int size = 0;
+                                    ArrayList<String> usernamee = new ArrayList<String>();
+                                    ArrayList<String> messageReceive = new ArrayList<String>();
+                                    ArrayList<String> timee = new ArrayList<String>();
+                                    while (res.next()) {
+                                        String user = res.getString(1);
+                                        String text = res.getString(2);
+                                        String time = res.getString(3);
+                                        if (username2.equals(user)) {
+                                            user = "You";
+                                        }
+                                        usernamee.add(user);
+                                        messageReceive.add(text);
+                                        timee.add(time);
+                                    }
+                                    out.writeInt(usernamee.size());
+                                    for (int i = 0; i < usernamee.size(); i++){
+                                        out.writeUTF(usernamee.get(i));
+                                        out.writeUTF(messageReceive.get(i));
+                                        out.writeUTF(timee.get(i));
+                                    }
+                                }
                                 break;
                             default:
 
@@ -132,24 +214,41 @@ public class ServerControls {
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(ServerControls.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(ServerControls.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
+                    Logger.getLogger(ServerControls.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
 
         //Send to user
-        public void sendMessage(String msg, String userToSend, Socket s) throws IOException {
+        public void sendMessage(String msg, String userToSend, Socket s, String curdate) throws IOException {
             DataOutputStream out = new DataOutputStream(s.getOutputStream());
             String action = "receive_msg";
             out.writeUTF(action);
             out.writeUTF(userToSend);
             out.writeUTF(msg);
+            out.writeUTF(curdate);
             String note = "Bạn có tin nhắn mới từ: " + userToSend;
             out.writeUTF(note);
         }
-        public void sendRequestFriend(Socket s, String action, String userSend) throws IOException{
+
+        public void sendRequestFriend(Socket s, String action, String userSend) throws IOException {
             DataOutputStream out = new DataOutputStream(s.getOutputStream());
             out.writeUTF(action);
             out.writeUTF(userSend);
+        }
+
+        public void sendFile(String username, Socket s, String fileName, String curdate, String action, String path) throws IOException {
+            DataOutputStream out = new DataOutputStream(s.getOutputStream());
+            out.writeUTF(action);
+            out.writeUTF(username);
+            out.writeUTF(fileName);
+            out.writeUTF(curdate);
+            out.writeUTF(path);
+            String note = "Bạn có tin nhắn mới từ: " + username;
+            out.writeUTF(note);
         }
     }
 

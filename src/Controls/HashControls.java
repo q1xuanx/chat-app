@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
  *
  * @author Admin
  */
-public class Utils {
+public class HashControls {
     public static String encryptPassword(String s) throws NoSuchAlgorithmException{
         MessageDigest dig = MessageDigest.getInstance("SHA-256");
         byte[] encode = dig.digest(s.getBytes(StandardCharsets.UTF_8));

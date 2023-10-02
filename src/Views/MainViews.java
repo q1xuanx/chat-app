@@ -5,25 +5,32 @@
  */
 package Views;
 
-import Controls.ClientsControls;
 import Controls.ClientsControls.ServerHandler;
-import Controls.ServerControls;
-import java.awt.CardLayout;
+import Controls.MyHyperLinkControls;
 import java.awt.Color;
-import java.awt.LayoutManager;
+import java.awt.Desktop;
+import static java.awt.SystemColor.text;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.sql.Date;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.StyledDocument;
+import javax.swing.text.html.HTMLDocument;
+import static org.eclipse.persistence.expressions.ExpressionOperator.trim;
 
 /**
  *
@@ -47,9 +54,12 @@ public class MainViews extends javax.swing.JFrame {
         this.socket = socket;
         this.username = username;
         this.lg = lg;
+        PanelSticker.setVisible(false);
+        sv = new ServerHandler(socket, displayMessage, userOnline, username, txtnote);
         PanelDisplay.setSelectedIndex(0);
-        sv = new ServerHandler(socket, displayMessage,userOnline,username, txtnote);
-        out = new DataOutputStream(socket.getOutputStream());
+        t = new Thread(sv);
+        t.start();
+        System.out.println(t.getName());
     }
 
     /**
@@ -61,6 +71,7 @@ public class MainViews extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        choseFile = new javax.swing.JFileChooser();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -93,9 +104,15 @@ public class MainViews extends javax.swing.JFrame {
         txtmessagesend = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        displayMessage = new javax.swing.JTextArea();
         jLabel10 = new javax.swing.JLabel();
+        jButton5 = new javax.swing.JButton();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        displayMessage = new javax.swing.JTextPane();
+        PanelSticker = new javax.swing.JPanel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -217,9 +234,9 @@ public class MainViews extends javax.swing.JFrame {
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addGap(23, 23, 23)
                 .addComponent(txtfindname, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel6)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -320,6 +337,7 @@ public class MainViews extends javax.swing.JFrame {
         jPanel8.setPreferredSize(new java.awt.Dimension(660, 614));
 
         jPanel9.setBackground(new java.awt.Color(255, 204, 153));
+        jPanel9.setMaximumSize(new java.awt.Dimension(617, 76));
 
         userSend.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         userSend.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -340,19 +358,19 @@ public class MainViews extends javax.swing.JFrame {
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(userSend, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 393, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 384, Short.MAX_VALUE)
                 .addComponent(jButton4)
-                .addGap(60, 60, 60))
+                .addGap(69, 69, 69))
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(jPanel9Layout.createSequentialGroup()
-                .addGap(11, 11, 11)
-                .addComponent(jButton4)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel9Layout.createSequentialGroup()
                 .addComponent(userSend, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton4)
+                .addContainerGap())
         );
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-send-30.png"))); // NOI18N
@@ -363,52 +381,115 @@ public class MainViews extends javax.swing.JFrame {
         });
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-send-file-30.png"))); // NOI18N
-
-        displayMessage.setEditable(false);
-        displayMessage.setColumns(20);
-        displayMessage.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
-        displayMessage.setRows(5);
-        displayMessage.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 4, true));
-        jScrollPane2.setViewportView(displayMessage);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-user-80 (1).png"))); // NOI18N
         jLabel10.setToolTipText("");
+
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-smile-30.png"))); // NOI18N
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
+        displayMessage.setEditable(false);
+        displayMessage.setFont(new java.awt.Font("Trebuchet MS", 1, 18)); // NOI18N
+        displayMessage.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                displayMessageMouseClicked(evt);
+            }
+        });
+        jScrollPane5.setViewportView(displayMessage);
+
+        PanelSticker.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-trash-dove-32.png"))); // NOI18N
+
+        jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-horns-headband-35.png"))); // NOI18N
+        jLabel13.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel14.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-toy-robot-32.png"))); // NOI18N
+
+        jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-pool-duck-32.png"))); // NOI18N
+
+        javax.swing.GroupLayout PanelStickerLayout = new javax.swing.GroupLayout(PanelSticker);
+        PanelSticker.setLayout(PanelStickerLayout);
+        PanelStickerLayout.setHorizontalGroup(
+            PanelStickerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelStickerLayout.createSequentialGroup()
+                .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel15)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        PanelStickerLayout.setVerticalGroup(
+            PanelStickerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelStickerLayout.createSequentialGroup()
+                .addGroup(PanelStickerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
+                    .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
         jPanel8Layout.setHorizontalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(PanelSticker, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.LEADING))
+                        .addGap(61, 61, 61))
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addComponent(txtmessagesend, javax.swing.GroupLayout.PREFERRED_SIZE, 483, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
+            .addGroup(jPanel8Layout.createSequentialGroup()
                 .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(jPanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 646, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel8Layout.createSequentialGroup()
-                        .addGap(3, 3, 3)
-                        .addComponent(txtmessagesend, javax.swing.GroupLayout.PREFERRED_SIZE, 495, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(12, 12, 12)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 437, Short.MAX_VALUE)
+                    .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 397, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(4, 4, 4)
+                .addComponent(PanelSticker, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txtmessagesend)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(25, 25, 25))
         );
 
         jPanel5.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 20, 660, 600));
@@ -452,13 +533,9 @@ public class MainViews extends javax.swing.JFrame {
         try {
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
-            if (!isThreadRunning) {
-                t = new Thread(sv);
-                t.start();
-                isThreadRunning = true;
-            }else if (t.isInterrupted()){
-                t.start();
-            }
+//            sv = new ServerHandler(socket, displayMessage, userOnline, username, txtnote);
+//            t = new Thread(sv);
+//            t.start();
             String opt = "get_user_online";
             out.writeUTF(opt);
         } catch (IOException ex) {
@@ -469,16 +546,23 @@ public class MainViews extends javax.swing.JFrame {
 //Call form main
     public static String currentChatWith = "";
     private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
-        if (t.isAlive() && t != null) {
-            t.interrupt();
-            isThreadRunning = false;
-        }
         PanelDisplay.setSelectedIndex(0);
+        currentChatWith = "";
     }//GEN-LAST:event_jLabel3MouseClicked
 //Display user can chat with 
     private void userOnlineMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_userOnlineMouseClicked
-        userSend.setText(userOnline.getSelectedValue());
-        currentChatWith = userOnline.getSelectedValue();
+        try {
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new DataInputStream(socket.getInputStream());
+            userSend.setText(userOnline.getSelectedValue());
+            out.writeUTF("send_old_message");
+            out.writeUTF(userSend.getText());
+            out.writeUTF(username);
+            currentChatWith = userOnline.getSelectedValue();
+        } catch (IOException ex) {
+            Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }//GEN-LAST:event_userOnlineMouseClicked
 
     private void txtfindnameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtfindnameActionPerformed
@@ -496,24 +580,36 @@ public class MainViews extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
+            if (txtmessagesend.getText().equals(null)) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập tin nhắn cần gửi");
+                return;
+            } else if (userSend.getText().equals("None")) {
+                JOptionPane.showMessageDialog(this, "Chọn người cần gửi");
+                return;
+            }
             out = new DataOutputStream(socket.getOutputStream());
             String choice = "send_message";
+            String curdate = getCurdate();
             out.writeUTF(choice);
             out.writeUTF(userSend.getText());
             out.writeUTF(txtmessagesend.getText());
             out.writeUTF(username);
+            out.writeUTF(curdate);
             out.flush();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-            LocalDateTime date = LocalDateTime.now();
-            String curdate = date.format(formatter);
-            displayMessage.append(username + ": " + txtmessagesend.getText() + "\n" + curdate + "\n");
-            displayMessage.setForeground(Color.black);
+            displayMessage(curdate, txtmessagesend.getText());
         } catch (IOException ex) {
+            Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (BadLocationException ex) {
             Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed
-
+    public String getCurdate() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        LocalDateTime date = LocalDateTime.now();
+        String curdate = date.format(formatter);
+        return curdate;
+    }
     private void jLabel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseClicked
         int ask = JOptionPane.showConfirmDialog(this, "Do you want log out ?");
         if (ask == 0) {
@@ -521,8 +617,8 @@ public class MainViews extends javax.swing.JFrame {
             try {
                 out = new DataOutputStream(socket.getOutputStream());
                 out.writeUTF(opt);
-                out.writeUTF(username);          
-                if (t.isAlive() || t != null){
+                out.writeUTF(username);
+                if (t.isAlive() || t != null) {
                     t.interrupt();
                     t.join();
                 }
@@ -544,10 +640,10 @@ public class MainViews extends javax.swing.JFrame {
             Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton3ActionPerformed
-
+    public static int accept = -1;
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         try {
-            if (currentChatWith.equals("")){
+            if (currentChatWith.equals("")) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn một người dùng online để thêm bạn");
                 return;
             }
@@ -555,10 +651,79 @@ public class MainViews extends javax.swing.JFrame {
             out.writeUTF("send_request_friend");
             out.writeUTF(currentChatWith);
             out.writeUTF(username);
+            if (accept == 0) {
+                JOptionPane.showMessageDialog(this, "Bạn và " + currentChatWith + " đã là bạn bè");
+                accept = -1;
+            }
         } catch (IOException ex) {
             Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton4ActionPerformed
+    public void displayMessage(String curdate, String msg) throws BadLocationException, IOException {
+        displayMessage.setContentType("text/html");
+        HTMLDocument display = (HTMLDocument) displayMessage.getDocument();
+        String s = "<br><p>" + "You: " + txtmessagesend.getText() + "<br>" + curdate + "</p>";
+        display.insertAfterEnd(display.getCharacterElement(display.getLength()), s);
+        displayMessage.setForeground(Color.black);
+    }
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        String act = "send_file";
+        try {
+            if (currentChatWith.equals("")) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn một người dùng online gửi FILE");
+                return;
+            }
+            int bytes = 0;
+            out = new DataOutputStream(socket.getOutputStream());
+            out.writeUTF(act);
+            choseFile.setDialogTitle("Chọn File");
+            choseFile.showOpenDialog(this);
+            String path = choseFile.getSelectedFile().toPath().toString();
+            String nameOfFile = choseFile.getSelectedFile().getName();
+            File file = new File(path);
+            FileInputStream fileRead = new FileInputStream(file);
+            String curdate = getCurdate();
+            out.writeUTF(userSend.getText());
+            out.writeLong(file.length());
+            out.writeUTF(nameOfFile);
+            out.writeUTF(curdate);
+            out.writeUTF(username);
+            byte[] sendFile = new byte[4 * 1024];
+            while ((bytes = fileRead.read(sendFile)) != -1) {
+                out.write(sendFile);
+                out.flush();
+            }
+            Path filechose = choseFile.getSelectedFile().toPath();
+            URL urlfile = filechose.toUri().toURL();
+            displayMessage.setContentType("text/html");
+            String msg = "<br>You: " + "<a href='"+urlfile+"'>"+nameOfFile+"</a>"+ "<br>" + curdate + "<br>";
+            HTMLDocument doc = (HTMLDocument) displayMessage.getDocument();
+            doc.insertAfterEnd(doc.getCharacterElement(doc.getLength()),msg);
+            displayMessage.addHyperlinkListener(new MyHyperLinkControls());
+            fileRead.close();
+        } catch (IOException ex) {
+            Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (BadLocationException ex) {
+            Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void displayMessageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_displayMessageMouseClicked
+
+
+    }//GEN-LAST:event_displayMessageMouseClicked
+
+    int setVis = 0;
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        if (setVis == 0){
+            PanelSticker.setVisible(true);
+            setVis = 1;
+        }else {
+            PanelSticker.setVisible(false);
+            setVis = 0;
+        }
+    }//GEN-LAST:event_jButton5ActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -585,7 +750,7 @@ public class MainViews extends javax.swing.JFrame {
         //</editor-fold>
         //</editor-fold>
 
-        /* Create and display the form */
+        /* Creat e and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
@@ -599,14 +764,21 @@ public class MainViews extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane PanelDisplay;
-    private javax.swing.JTextArea displayMessage;
+    private javax.swing.JPanel PanelSticker;
+    private javax.swing.JFileChooser choseFile;
+    private javax.swing.JTextPane displayMessage;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -626,9 +798,9 @@ public class MainViews extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTextField txtfindname;
     private javax.swing.JTextField txtmessagesend;
     private javax.swing.JTextArea txtnote;

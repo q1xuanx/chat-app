@@ -5,7 +5,8 @@
  */
 package Views;
 
-import Controls.Utils;
+import Controls.RegisterControls;
+import Controls.HashControls;
 import Models.RegisterModels;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
@@ -224,21 +225,22 @@ public class SignUpView extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Bạn không thể chọn 2 giới tính");
             btnNam.setSelected(false);
             btnNu.setSelected(false);
+            return;
         }
         String gioiTinh = "Nu";
         if (btnNam.isSelected()) {
             gioiTinh = "Nam";
         }
-        RegisterModels regis = new RegisterModels();
+        RegisterControls regis = new RegisterControls();
         String pass = "";
         String txtngaysinh = txtdate.getText() + "-" + txtmonth.getText() + "-" + txtyear.getText();
         try {
-            pass = Utils.encryptPassword(txtpass.getText());
+            pass = HashControls.encryptPassword(txtpass.getText());
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(SignUpView.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            int resgister = regis.registerConnect(txtGmail.getText(), pass, txtName.getText(), gioiTinh, txtngaysinh.trim());
+            int resgister = regis.SignUp(txtGmail.getText(), pass, txtName.getText(), gioiTinh, txtngaysinh.trim());
             if (resgister == 1) {
                 JOptionPane.showMessageDialog(null, "Đăng ký thành công");
                 setNull();

@@ -1,0 +1,5 @@
+
+Tham khảo
+
+https://heptadecane.medium.com/file-transfer-via-java-sockets-e8d4f30703a5
+
