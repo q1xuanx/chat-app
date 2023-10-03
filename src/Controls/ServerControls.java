@@ -6,6 +6,7 @@
 package Controls;
 
 import Controls.ServerControls.HandleClient;
+import static Controls.ServerControls.mp;
 import Models.ListUserModels;
 import Views.LoginViews;
 import Views.MainViews;
@@ -20,6 +21,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +54,6 @@ public class ServerControls {
             out = new DataOutputStream(client.getOutputStream());
             String username = in.readUTF();
             System.out.println("[LOG]" + username + " has login to server");
-            mp.put(username, client);
             HandleClient hc = new HandleClient(client, in, out);
             Thread t = new Thread(hc);
             t.start();
@@ -86,6 +87,30 @@ public class ServerControls {
                     String choice = in.readUTF();
                     if (client.isConnected()) {
                         switch (choice) {
+                            case "login":
+                                String email = in.readUTF();
+                                String pass = in.readUTF();
+                                LoginControls lc = new LoginControls();
+                                boolean checkLog = lc.checkLogin(email, pass);
+                                out.writeBoolean(checkLog);
+                                if (checkLog == true) {
+                                    mp.put(email, client);
+                                    System.out.println("[LOG] " + email + " đã đăng nhập");
+                                }
+                                break;
+                            case "sign_up":
+                                RegisterControls regis = new RegisterControls();
+                                email = in.readUTF();
+                                pass = in.readUTF();
+                                String fullname = in.readUTF();
+                                String gt = in.readUTF();
+                                String ns = in.readUTF();
+                                int checkSign = regis.SignUp(email, pass,fullname, gt, ns);
+                                out.writeInt(checkSign);
+                                if (checkSign == 1){
+                                    System.out.println("[LOG] Chào mừng thành viên mới: " + email);
+                                }
+                                break;
                             case "send_message":
                                 String userToSend = in.readUTF();
                                 String msg = in.readUTF();
@@ -107,6 +132,7 @@ public class ServerControls {
                                     String ID = addDB.checkChat(userSend, userToSend);
                                     addDB.storeMess(ID, userSend, msg, curdate);
                                 }
+                                System.out.println("[LOG] " + userToSend + " đã gửi tin nhắn đến " + userSend);
                                 sendMessage(msg, userSend, temp, curdate);
                                 break;
                             case "get_user_online":
@@ -164,14 +190,15 @@ public class ServerControls {
                                 Path filePath = file.toPath();
                                 URL urlfile = filePath.toUri().toURL();
                                 if (!check.equals("")) {
-                                    storeFile.storeMess(check, usersend,"[FILE] " + urlfile.toString(),curdat);
+                                    storeFile.storeMess(check, usersend, "[FILE] " + urlfile.toString(), curdat);
                                 } else {
                                     storeFile.addNewChat(usersend, senduser);
                                     String ID = storeFile.checkChat(usersend, senduser);
-                                    storeFile.storeMess(ID, usersend,"[FILE] " + urlfile.toString(), curdat);
+                                    storeFile.storeMess(ID, usersend, "[FILE] " + urlfile.toString(), curdat);
                                 }
                                 String fileSend = file.getName();
                                 sendFile(usersend, receiveFile, fileSend, curdat, "receive_file", urlfile.toString());
+                                System.out.println("[LOG] " + usersend + " đã gửi tập tin đến " + senduser);
                                 break;
                             case "send_old_message":
                                 String username1 = in.readUTF();
@@ -182,9 +209,9 @@ public class ServerControls {
                                     out.writeUTF("receive_old_message");
                                     ResultSet res = sendOldMsg.takeOldMessage(s);
                                     int size = 0;
-                                    ArrayList<String> usernamee = new ArrayList<String>();
-                                    ArrayList<String> messageReceive = new ArrayList<String>();
-                                    ArrayList<String> timee = new ArrayList<String>();
+                                    ArrayList<String> usernamee = new ArrayList<>();
+                                    ArrayList<String> messageReceive = new ArrayList<>();
+                                    ArrayList<String> timee = new ArrayList<>();
                                     while (res.next()) {
                                         String user = res.getString(1);
                                         String text = res.getString(2);
@@ -197,12 +224,36 @@ public class ServerControls {
                                         timee.add(time);
                                     }
                                     out.writeInt(usernamee.size());
-                                    for (int i = 0; i < usernamee.size(); i++){
+                                    for (int i = 0; i < usernamee.size(); i++) {
                                         out.writeUTF(usernamee.get(i));
                                         out.writeUTF(messageReceive.get(i));
                                         out.writeUTF(timee.get(i));
                                     }
                                 }
+                                break;
+                            case "send_pic":
+                                String usersd = in.readUTF();
+                                String userrei = in.readUTF();
+                                String pathPic = in.readUTF();
+                                String datesend = in.readUTF();
+                                Socket sd = null;
+                                for (Map.Entry<String, Socket> m : mp.entrySet()) {
+                                    if (m.getKey().equals(userrei)) {
+                                        sd = m.getValue();
+                                        break;
+                                    }
+                                }
+                                StoreMsgControls addDBPic = new StoreMsgControls();
+                                String idchat = addDBPic.checkChat(usersd, userrei);
+                                if (!idchat.equals("")) {
+                                    addDBPic.storeMess(idchat, usersd, "[IMAGE]" + pathPic, datesend);
+                                } else {
+                                    addDBPic.addNewChat(usersd, userrei);
+                                    String ID = addDBPic.checkChat(usersd, userrei);
+                                    addDBPic.storeMess(ID, usersd, "[IMAGE]" + pathPic, datesend);
+                                }
+                                sendPic("rei_pic", usersd, sd, pathPic, datesend);
+                                System.out.println("[LOG] " + usersd + " đã gửi nhãn dán đến " + userrei);
                                 break;
                             default:
 
@@ -217,6 +268,8 @@ public class ServerControls {
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(ServerControls.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {
+                    Logger.getLogger(ServerControls.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ParseException ex) {
                     Logger.getLogger(ServerControls.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -247,6 +300,16 @@ public class ServerControls {
             out.writeUTF(fileName);
             out.writeUTF(curdate);
             out.writeUTF(path);
+            String note = "Bạn có tin nhắn mới từ: " + username;
+            out.writeUTF(note);
+        }
+
+        public void sendPic(String action, String username, Socket s, String pathPic, String curdate) throws IOException {
+            DataOutputStream out = new DataOutputStream(s.getOutputStream());
+            out.writeUTF(action);
+            out.writeUTF(username);
+            out.writeUTF(pathPic);
+            out.writeUTF(curdate);
             String note = "Bạn có tin nhắn mới từ: " + username;
             out.writeUTF(note);
         }

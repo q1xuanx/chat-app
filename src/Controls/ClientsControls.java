@@ -23,6 +23,7 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
@@ -30,6 +31,9 @@ import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import javax.swing.text.html.HTMLDocument;
 
 /**
@@ -50,7 +54,6 @@ public class ClientsControls {
 
         public ServerHandler(Socket client, JTextPane txtdisplay, JList userOnline, String username, JTextArea thongBao) {
             ServerHandler.client = client;
-
             ServerHandler.txtdisplay = txtdisplay;
             ServerHandler.userOnline = userOnline;
             ServerHandler.username = username;
@@ -76,7 +79,7 @@ public class ClientsControls {
                                 if (MainViews.currentChatWith.equals(userName) && !MainViews.currentChatWith.equals("None")) {
                                     txtdisplay.setContentType("text/html");
                                     HTMLDocument display = (HTMLDocument) txtdisplay.getDocument();
-                                    String s = "<br><p>" + userName + ": " + msg + "<br>" + curdate + "</p>";
+                                    String s = userName + ": " + msg + "<br>" + curdate + "<br>";
                                     display.insertAfterEnd(display.getCharacterElement(display.getLength()), s);
                                     txtdisplay.setForeground(Color.blue);
                                 } else {
@@ -116,18 +119,29 @@ public class ClientsControls {
                                             String filepath = message.replace(start, "");
                                             File filesave = new File(filepath);
                                             URL urls = new URL(filepath);
-                                            String sendFile = user + ": <a href='" + urls + "'>" + filesave.getName() + "</a>" + "<br>" + timesend;
+                                            String sendFile = user + ": <a href='" + urls + "'>" + filesave.getName() + "</a>" + "<br>" + timesend + "<br>";
                                             HTMLDocument doc = (HTMLDocument) txtdisplay.getDocument();
                                             doc.insertAfterEnd(doc.getCharacterElement(doc.getLength()), sendFile);
                                             txtdisplay.setForeground(Color.blue);
                                             txtdisplay.addHyperlinkListener(new MyHyperLinkControls());
+                                        } else if (message.contains("[IMAGE]")) {
+                                            txtdisplay.setContentType("text/html");
+                                            String start = "[IMAGE]";
+                                            String file = message.replace(start, "");
+                                            StyledDocument doc = (StyledDocument) txtdisplay.getDocument();
+                                            Style st = doc.addStyle("Image", null);
+                                            StyleConstants.setIcon(st, new ImageIcon(file));
+                                            doc.insertString(doc.getLength(), "\n", null);
+                                            doc.insertString(doc.getLength(), user, null);
+                                            doc.insertString(doc.getLength(), "Image", st);
+                                            doc.insertString(doc.getLength(), "\n", null);
+                                            doc.insertString(doc.getLength(), timesend, null);
+                                            doc.insertString(doc.getLength(), "\n", null);
                                         } else {
                                             txtdisplay.setContentType("text/html");
-                                            String s = "<br><p>" + user + ": " + message + "<br>" + timesend + "</p>";
+                                            String s = user + ": " + message + "<br>" + timesend + "<br>";
                                             HTMLDocument doc = (HTMLDocument) txtdisplay.getDocument();
                                             doc.insertAfterEnd(doc.getCharacterElement(doc.getLength()), s);
-                                            String t = txtdisplay.getText().trim();
-                                            txtdisplay.setText(t);
                                         }
                                         size--;
                                         if (size == 0) {
@@ -147,13 +161,32 @@ public class ClientsControls {
                                 URL url = new URL(urlString);
                                 if (MainViews.currentChatWith.equals(username) && !MainViews.currentChatWith.equals("None")) {
                                     txtdisplay.setContentType("text/html");
-                                    String sendFile = "\n" + username + ": <a href='" + url + "'>" + filename + "</a>" + "\n" + curdat + "\n";
+                                    String sendFile = "<br>" + username + ": <a href='" + url + "'>" + filename + "</a>" + "<br>" + curdat + "<br>";
                                     HTMLDocument doc = (HTMLDocument) txtdisplay.getDocument();
                                     doc.insertAfterEnd(doc.getCharacterElement(doc.getLength()), sendFile);
                                     txtdisplay.setForeground(Color.blue);
                                     txtdisplay.addHyperlinkListener(new MyHyperLinkControls());
                                 } else {
                                     thongBao.append(in.readUTF() + "\n");
+                                }
+                                break;
+                            case "rei_pic":
+                                String nameuser = in.readUTF();
+                                String pathPic = in.readUTF();
+                                String datesend = in.readUTF();
+                                txtdisplay.setContentType("text/html");
+                                StyledDocument doc = (StyledDocument) txtdisplay.getDocument();
+                                Style style = doc.addStyle("Image", null);
+                                StyleConstants.setIcon(style, new ImageIcon(pathPic));
+                                try {
+                                    doc.insertString(doc.getLength(), "\n", null);
+                                    doc.insertString(doc.getLength(), nameuser, null);
+                                    doc.insertString(doc.getLength(), "Image", style);
+                                    doc.insertString(doc.getLength(), "\n", null);
+                                    doc.insertString(doc.getLength(), datesend, null);
+                                    doc.insertString(doc.getLength(), "\n", null);
+                                } catch (BadLocationException ex) {
+                                    Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                                 break;
                         }

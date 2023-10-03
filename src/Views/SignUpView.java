@@ -8,6 +8,10 @@ package Views;
 import Controls.RegisterControls;
 import Controls.HashControls;
 import Models.RegisterModels;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -24,8 +28,15 @@ public class SignUpView extends javax.swing.JFrame {
     /**
      * Creates new form SignUpView
      */
-    public SignUpView() {
+    private static Socket client;
+    private static DataInputStream in;
+    private static DataOutputStream out;
+
+    public SignUpView(Socket client, DataInputStream in, DataOutputStream out) {
         initComponents();
+        this.client = client;
+        this.in = in;
+        this.out = out;
     }
 
     /**
@@ -231,7 +242,6 @@ public class SignUpView extends javax.swing.JFrame {
         if (btnNam.isSelected()) {
             gioiTinh = "Nam";
         }
-        RegisterControls regis = new RegisterControls();
         String pass = "";
         String txtngaysinh = txtdate.getText() + "-" + txtmonth.getText() + "-" + txtyear.getText();
         try {
@@ -240,19 +250,21 @@ public class SignUpView extends javax.swing.JFrame {
             Logger.getLogger(SignUpView.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            int resgister = regis.SignUp(txtGmail.getText(), pass, txtName.getText(), gioiTinh, txtngaysinh.trim());
-            if (resgister == 1) {
-                JOptionPane.showMessageDialog(null, "Đăng ký thành công");
+            out.writeUTF("sign_up");
+            out.writeUTF(txtGmail.getText());
+            out.writeUTF(pass);
+            out.writeUTF(txtName.getText());
+            out.writeUTF(gioiTinh);
+            out.writeUTF(txtngaysinh.trim());
+            int register = in.readInt();
+            if (register == 1) {
+                JOptionPane.showMessageDialog(null, "Đăng kí thành công");
                 setNull();
             } else {
-                JOptionPane.showMessageDialog(null, "Đăng ký thất bại");
+                JOptionPane.showMessageDialog(null, "Đăng kí thất bại");
                 setNull();
             }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SignUpView.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(SignUpView.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParseException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(SignUpView.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -301,7 +313,7 @@ public class SignUpView extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new SignUpView().setVisible(true);
+                new SignUpView(client, in, out).setVisible(true);
             }
         });
     }

@@ -32,8 +32,12 @@ public class LoginViews extends javax.swing.JFrame {
     DataInputStream in;
     DataOutputStream out;
     
-    public LoginViews() {
+    public LoginViews() throws IOException {
         initComponents();
+        client = new Socket("localhost",7777);
+        in = new DataInputStream(client.getInputStream());
+        out = new DataOutputStream(client.getOutputStream());
+        out.writeUTF(client.toString());
     }
 
     /**
@@ -228,12 +232,12 @@ public class LoginViews extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        SignUpView sign = new SignUpView();
+        SignUpView sign = new SignUpView(client,in,out);
         sign.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        LoginControls lm = new LoginControls();
+        //LoginControls lm = new LoginControls();
         String hash = "";
         try {
             hash = HashControls.encryptPassword(txtpassword.getText());
@@ -241,23 +245,23 @@ public class LoginViews extends javax.swing.JFrame {
             Logger.getLogger(LoginViews.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            boolean checkUser = lm.checkLogin(txtusername.getText(), hash);
-            if (checkUser){
-                client = new Socket("localhost",7777);
-                out = new DataOutputStream(client.getOutputStream());
-                out.writeUTF(txtusername.getText());
-                MainViews fr = new MainViews(client,txtusername.getText(),this);
-                fr.setVisible(true);
-                this.hide();
+            out.writeUTF("login");
+            out.writeUTF(txtusername.getText());
+            out.writeUTF(hash);
+            boolean check = in.readBoolean();
+            if(check == true){
+                   MainViews mv = new MainViews(client,txtusername.getText(),this);
+                   mv.setVisible(true);
+                   this.hide();
             }else {
-                JOptionPane.showMessageDialog(null,"Sai tên tài khoản hoặc mật khẩu");
+                JOptionPane.showMessageDialog(this,"Sai tên tài khoản hoặc mật khẩu");
             }
-        } catch (ClassNotFoundException | SQLException | IOException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(LoginViews.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
     
-    /**
+    /**t
      * @param args the command line arguments
      */
     public static void main(String args[]) {
@@ -287,7 +291,11 @@ public class LoginViews extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new LoginViews().setVisible(true);
+                try {
+                    new LoginViews().setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(LoginViews.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
