@@ -1,0 +1,22 @@
+Làm Báo Cáo 
+4 CHƯƠNG
+- Chương 1 (3 - 5) Tổng Quan - MB1: Xu hướng đề tài(Đánh caro, hoặc...)
+		             - TB1: Tài liệu tham khảo, các tài liệu liên quan, => nêu ra sự khác biệt 
+                             - TB2: Kết quả triển khai ứng dụng(đáp ứng được những gì...)
+                             - KB: Kết quả đạt được của ứng dụng 
+- Chương 2 (Mô hình đề xuất ứng dụng | Phần mềm | ...)
+	2.1 Mô hình đề xuất( Vẽ sơ đồ...)
+	2.2 Vẽ ERD 
+	2.3 Truy vấn dữ liệu (Trình bày SP, trigger, những câu query) => 10 -> 15 trang
+-Chương 3 Triển khai ứng dụng/Phần mềm(Tên ứng dụng, vv)
+	3.1 Triền khai client(Giao diện xinh đẹp) 
+	3.2 Triển khai ở server 
+	3.3 Đánh giá: qua thực nghiệm
+- Chương 4: Kết luận 
+	4.1 Kết quả đạt được +
+			     +
+			     +
+		             + 
+                             ...
+	4.2 Hạn chế +
+	4.3 Hướng phát triển +++++
