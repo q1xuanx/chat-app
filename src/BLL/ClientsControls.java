@@ -6,6 +6,7 @@
 package BLL;
 
 import PL.CreateGroupViews;
+import PL.LoginViews;
 import PL.MainViews;
 import static PL.MainViews.currentChatWith;
 import static PL.MainViews.userSend;
@@ -129,7 +130,7 @@ public class ClientsControls {
                             case "receive_request":
                                 String requestFrom = in.readUTF();
                                 int checkReques = JOptionPane.showConfirmDialog(null, requestFrom + " muốn kết bạn với bạn");
-                                out.writeUTF("handle_request");
+                                out.writeUTF("handle_request1");
                                 out.writeInt(checkReques);
                                 out.writeUTF(username);
                                 out.writeUTF(requestFrom);
@@ -144,7 +145,7 @@ public class ClientsControls {
                                     out.writeUTF(MainViews.username);
                                 }
                                 break;
-                            case "handl_request1":
+                            case "handle_request1":
                                 int sizeOfListFriend = in.readInt();
                                 DefaultListModel dfa = new DefaultListModel();
                                 for (int i = 0; i < sizeOfListFriend; i++) {
@@ -206,6 +207,9 @@ public class ClientsControls {
                             case "join_success":
                                 String groupHasJoined = in.readUTF();
                                 JOptionPane.showMessageDialog(null, "Bạn đã tham gia nhóm " + groupHasJoined);
+                                out.writeUTF("send_old_message_group");
+                                out.writeUTF(username);
+                                out.writeUTF(groupHasJoined);
                                 MainViews.nameofgroup.setText(groupHasJoined);
                                 MainViews.currentChatWith = groupHasJoined;
                                 break;
@@ -225,6 +229,7 @@ public class ClientsControls {
                                             String filepath = message.replace(start, "");
                                             File filesave = new File(filepath);
                                             URL urls = new URL(filepath);
+                                            System.out.println(urls.toString());
                                             String sendFile = user + ": <a href='" + urls + "'>" + filesave.getName() + "</a>" + "<br>" + timesend + "<br>";
                                             HTMLDocument doc = (HTMLDocument) MainViews.displayMessage.getDocument();
                                             doc.insertAfterEnd(doc.getCharacterElement(doc.getLength()), sendFile);
@@ -272,6 +277,7 @@ public class ClientsControls {
                                             String filepathG = message.replace(startW, "");
                                             File filesaveG = new File(filepathG);
                                             URL urls = new URL(filepathG);
+                                            System.out.println(urls.toString());
                                             String sendFile = user + ": <a href='" + urls + "'>" + filesaveG.getName() + "</a>" + "<br>" + timesend + "<br>";
                                             HTMLDocument document = (HTMLDocument) MainViews.displayMessageGroup.getDocument();
                                             document.insertAfterEnd(document.getCharacterElement(document.getLength()), sendFile);
@@ -284,7 +290,6 @@ public class ClientsControls {
                                             StyledDocument document = (StyledDocument) MainViews.displayMessageGroup.getDocument();
                                             Style st = document.addStyle("Image", null);
                                             StyleConstants.setIcon(st, new ImageIcon(filepathG));
-                                            document.insertString(document.getLength(), "\n", null);
                                             document.insertString(document.getLength(), user, null);
                                             document.insertString(document.getLength(), "Image", st);
                                             document.insertString(document.getLength(), "\n", null);
@@ -304,8 +309,10 @@ public class ClientsControls {
                                 }
                                 break;
                             case "kill_thread":
-                                // Imple....
-                                return;
+                                LoginViews lgs = new LoginViews();
+                                lgs.setVisible(true);
+                                MainViews.t.interrupt();
+                                break;
                             case "receive_file":
                                 in = new DataInputStream(client.getInputStream());
                                 String username = in.readUTF();
@@ -393,9 +400,11 @@ public class ClientsControls {
                                     JOptionPane.showMessageDialog(null, "Người dùng không khả dụng");
                                 } else {
                                     MainViews.userSend.setText(MainViews.userOnline.getSelectedValue());
+                                    MainViews.currentChatWith = MainViews.userOnline.getSelectedValue();
                                     out.writeUTF("send_old_message");
                                     out.writeUTF(userSend.getText());
-                                    out.writeUTF(ServerHandler.username);
+                                    out.writeUTF(MainViews.username);
+                                    System.out.println(MainViews.username);
                                 }
                                 break;
                             case "display_group":

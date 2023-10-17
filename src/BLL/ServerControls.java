@@ -55,7 +55,7 @@ public class ServerControls {
             in = new DataInputStream(client.getInputStream());
             out = new DataOutputStream(client.getOutputStream());
             String username = in.readUTF();
-            System.out.println("[LOG]" + username + " has login to server");
+            System.out.println("[LOG]" + username + " new socket connect");
             HandleClient hc = new HandleClient(client, in, out);
             Thread t = new Thread(hc);
             t.start();
@@ -152,9 +152,10 @@ public class ServerControls {
                             case "user_out":
                                 String username = in.readUTF();
                                 System.out.println("[LOG]" + username + " has left");
-                                mp.remove(username);
-                                client.close();
+                                Socket getOut = mp.get(username);
+                                out = new DataOutputStream(getOut.getOutputStream());
                                 out.writeUTF("kill_thread");
+                                mp.remove(username);
                                 break;
                             case "send_request_friend":
                                 String userNeedToSend = in.readUTF();
@@ -346,6 +347,7 @@ public class ServerControls {
                                 System.out.println("[LOG] " + usersendGroup + " đã gửi nhãn dán đến nhóm " + nameGroupRei);
                                 break;
                             case "block_user":
+                                ListUserModels rmvFriend = new ListUserModels();
                                 action = "block_user";
                                 String userSendBlock = in.readUTF();
                                 String userBlock = in.readUTF();
@@ -353,8 +355,20 @@ public class ServerControls {
                                 int blocked = bl.addUserToBlock(userSendBlock, userBlock);
                                 if (blocked == 1) {
                                     Socket block = null;
+                                    Socket updateFr1 = null;
+                                    Socket updateFr2 = null;
+                                    int rmvfr1 = rmvFriend.RmvFriend(userSendBlock, userBlock);
+                                    int rmvfr2 = rmvFriend.RmvFriend(userBlock, userSendBlock);    
+                                    updateFr1 = mp.get(userSendBlock);
+                                    updateFr2 = mp.get(userBlock);
+                                    if (updateFr1 != null && rmvfr1 == 1){
+                                        displayFriendList("handle_request1",updateFr1,userSendBlock);
+                                    }
+                                    if (updateFr2 != null && rmvfr2 == 1){
+                                        displayFriendList("handle_request1",updateFr2,userBlock);
+                                    }
                                     if (mp.get(userBlock) != null) {
-                                        block = mp.get(userBlock);
+                                        block = mp.get(userBlock);                                 
                                         sendBlockAct("user_blocked", block, userSendBlock);
                                     }
                                 }
@@ -365,6 +379,7 @@ public class ServerControls {
                             case "check_block_or_not":
                                 String userNeed = in.readUTF();
                                 String userCheck = in.readUTF();
+                                System.out.println(userNeed + " " + userCheck);
                                 BlockControls bc = new BlockControls();
                                 ResultSet checkBlock = bc.checkBlock(userNeed, userCheck);
                                 String revac = "check_block_or_not";
@@ -500,9 +515,9 @@ public class ServerControls {
                                 File fileGroup = new File(path);
                                 FileOutputStream saveFileGroup = new FileOutputStream(fileGroup);
                                 byte[] read = new byte[4 * 1024];
-                                while (sizeOfFile > 0 && (bytes = in.read(read, 0, (int) Math.min(read.length, sizeOfFile))) != -1) {
-                                    saveFileGroup.write(read, 0, bytes);
-                                    sizeOfFile -= bytes;
+                                while (sizeOfFile > 0 && (byt = in.read(read, 0, (int) Math.min(read.length, sizeOfFile))) != -1) {
+                                    saveFileGroup.write(read, 0, byt);
+                                    sizeOfFile -= byt;
                                 }
                                 for (int i = 0; i < listMemFile.size(); i++) {
                                     if (mp.get(listMemFile.get(i)) != null && !listMemFile.get(i).equals(usersend)) {
@@ -570,7 +585,7 @@ public class ServerControls {
                                 break;
                         }
                     } else {
-                        sv.close();
+                        client.close();
                         break;
                     }
                 } catch (IOException ex) {
@@ -631,7 +646,7 @@ public class ServerControls {
             DataOutputStream out;
             for (int i = 0; i < arr.size(); i++) {
                 out = new DataOutputStream(arr.get(i).getOutputStream());
-                out.writeUTF("send_file_to_group");
+                out.writeUTF("receive_file_group");
                 out.writeUTF(username);
                 out.writeUTF(fileName);
                 out.writeUTF(curdate);
@@ -707,7 +722,7 @@ public class ServerControls {
                         break;
                     case "-userlist":
                         ListUserModels ls = new ListUserModels();
-                        {
+                         {
                             try {
                                 System.out.println("Số lượng user online: " + mp.size() + "| Tổng số user " + ls.totalUser());
                             } catch (ClassNotFoundException ex) {

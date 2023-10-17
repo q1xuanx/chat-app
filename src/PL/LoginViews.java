@@ -29,15 +29,14 @@ public class LoginViews extends javax.swing.JFrame {
     /**
      * Creates new form LoginViews
      */
-    
-    Socket client; 
+    Socket client;
     DataInputStream in;
     DataOutputStream out;
-    
+
     public LoginViews() throws IOException {
         initComponents();
-        this.setLocationRelativeTo(null);
-        client = new Socket("localhost",7777);
+        this.setLocationRelativeTo(null); 
+        client = new Socket("localhost", 7777);
         in = new DataInputStream(client.getInputStream());
         out = new DataOutputStream(client.getOutputStream());
         out.writeUTF(client.toString());
@@ -235,12 +234,11 @@ public class LoginViews extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        SignUpView sign = new SignUpView(client,in,out);
+        SignUpView sign = new SignUpView(client, in, out);
         sign.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
         String hash = "";
         try {
             hash = HashControls.encryptPassword(txtpassword.getText());
@@ -248,23 +246,26 @@ public class LoginViews extends javax.swing.JFrame {
             Logger.getLogger(LoginViews.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
+            out = new DataOutputStream(client.getOutputStream());
             out.writeUTF("login");
             out.writeUTF(txtusername.getText());
             out.writeUTF(hash);
             boolean check = in.readBoolean();
-            if(check == true){
-                   MainViews mv = new MainViews(client,txtusername.getText(),this);
-                   mv.setVisible(true);
-                   this.hide();
-            }else {
-                JOptionPane.showMessageDialog(this,"Sai tên tài khoản hoặc mật khẩu");
+            if (check == true) {
+                MainViews mv = new MainViews(client, txtusername.getText());
+                mv.setVisible(true);
+                this.hide();
+            } else {
+                JOptionPane.showMessageDialog(this, "Sai tên tài khoản hoặc mật khẩu");
             }
         } catch (IOException ex) {
             Logger.getLogger(LoginViews.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
-    
-    /**t
+
+    /**
+     * t
+     *
      * @param args the command line arguments
      */
     public static void main(String args[]) {

@@ -50,22 +50,20 @@ public class MainViews extends javax.swing.JFrame {
     public static DataInputStream in;
     static DataOutputStream out;
     public static String username = "";
-    static LoginViews lg;
-    static Thread t;
+    //public static LoginViews lg;
+    public static Thread t;
     static ServerHandler sv;
 
-    public MainViews(Socket socket, String username, LoginViews lg) throws IOException {
+    public MainViews(Socket socket, String username) throws IOException {
         initComponents();
         this.setLocationRelativeTo(null);
         this.socket = socket;
         this.username = username;
-        this.lg = lg;
         sv = new ServerHandler(socket, userOnline, username, txtnote);
         PanelDisplay.setSelectedIndex(0);
         t = new Thread(sv);
         t.start();
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -156,6 +154,11 @@ public class MainViews extends javax.swing.JFrame {
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-setting-35.png"))); // NOI18N
+        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel2MouseClicked(evt);
+            }
+        });
 
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-home-35.png"))); // NOI18N
@@ -823,7 +826,8 @@ public class MainViews extends javax.swing.JFrame {
         try {
             out = new DataOutputStream(socket.getOutputStream());
             in = new DataInputStream(socket.getInputStream());
-            if (!userSend.getText().equals(currentChatWith)) {
+            if (!userSend.getText().equals(userOnline.getSelectedValue())) {
+                displayMessage.setText(null);
                 out.writeUTF("check_block_or_not");
                 out.writeUTF(userOnline.getSelectedValue());
                 out.writeUTF(username);
@@ -888,15 +892,8 @@ public class MainViews extends javax.swing.JFrame {
                 out = new DataOutputStream(socket.getOutputStream());
                 out.writeUTF(opt);
                 out.writeUTF(username);
-                if (t.isAlive() || t != null) {
-                    t.interrupt();
-                    t.join();
-                }
                 this.dispose();
-                lg.setVisible(true);
             } catch (IOException ex) {
-                Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InterruptedException ex) {
                 Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -1432,6 +1429,10 @@ public class MainViews extends javax.swing.JFrame {
         
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jLabel2MouseClicked
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -1461,7 +1462,7 @@ public class MainViews extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new MainViews(socket, username, lg).setVisible(true);
+                    new MainViews(socket, username).setVisible(true);
                 } catch (IOException ex) {
                     Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
                 }

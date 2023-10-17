@@ -19,4 +19,12 @@ public class UserControls {
         ResultSet res = lum.getAllUser();
         return res;
     }
+    public void rmvFriend(String username1, String username2) throws ClassNotFoundException, SQLException{
+        ListUserModels lum  = new ListUserModels();
+        int rmv1 = lum.RmvFriend(username1, username2);
+        int rmv2 = lum.RmvFriend(username2, username1);
+        if (rmv1 == 1 && rmv2 == 1){
+            System.out.println("[LOG]Đã remove bạn của " + username1 +" và " + username2);
+        }
+    }
 }

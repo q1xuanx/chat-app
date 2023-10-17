@@ -30,4 +30,9 @@ public class ListUserModels {
         ResultSet rs = db.ExQuery(q);
         return rs;
     }
+    public int RmvFriend(String username1, String username2) throws ClassNotFoundException, SQLException{
+        DBAccess db = new DBAccess();
+        String q = "exec rmvFriend '"+username1+"', '"+username2+"'";
+        return db.UpdateTable(q);
+    }
 }
