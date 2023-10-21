@@ -24,7 +24,27 @@ public class UserControls {
         int rmv1 = lum.RmvFriend(username1, username2);
         int rmv2 = lum.RmvFriend(username2, username1);
         if (rmv1 == 1 && rmv2 == 1){
-            System.out.println("[LOG]Đã remove bạn của " + username1 +" và " + username2);
+            System.out.println("[LOG] Đã remove bạn của " + username1 +" và " + username2);
         }
+    }
+    public int changePass(String username, String pass) throws ClassNotFoundException, SQLException{
+        ListUserModels lms = new ListUserModels();
+        return lms.changePass(username, pass);
+    }
+    public int isAdmin(String username) throws ClassNotFoundException, SQLException{
+        ListUserModels lms = new ListUserModels();
+        ResultSet res = lms.isAdmin(username);
+        if (res.next()){
+            return 1;
+        }
+        return 0;
+    }
+    public ResultSet getUserBan() throws ClassNotFoundException, SQLException{
+        ListUserModels lms = new ListUserModels();
+        return lms.displayBanUser();
+    }
+    public int UnBan(String username) throws ClassNotFoundException, SQLException{
+        ListUserModels lms = new ListUserModels();
+        return lms.UnBan(username);
     }
 }

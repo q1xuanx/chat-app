@@ -30,6 +30,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.table.TableModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -63,7 +64,14 @@ public class MainViews extends javax.swing.JFrame {
         PanelDisplay.setSelectedIndex(0);
         t = new Thread(sv);
         t.start();
+        out = new DataOutputStream(socket.getOutputStream());
+        out.writeUTF("is_admin");
+        out.writeUTF(username);
+        out.writeUTF("user_online");
+        out.writeUTF("handle_request2");
+        out.writeUTF(username);
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -74,12 +82,15 @@ public class MainViews extends javax.swing.JFrame {
     private void initComponents() {
 
         choseFile = new javax.swing.JFileChooser();
+        jScrollPane7 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        setting = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
+        logout = new javax.swing.JLabel();
+        admin = new javax.swing.JLabel();
         PanelDisplay = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
@@ -93,7 +104,6 @@ public class MainViews extends javax.swing.JFrame {
         userOnline = new javax.swing.JList<>();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        reloadBtn = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         txtnote = new javax.swing.JTextArea();
         jLabel11 = new javax.swing.JLabel();
@@ -137,6 +147,24 @@ public class MainViews extends javax.swing.JFrame {
         stickerGroup2 = new javax.swing.JLabel();
         stickerGroup3 = new javax.swing.JLabel();
         stickerGroup4 = new javax.swing.JLabel();
+        jPanel13 = new javax.swing.JPanel();
+        jPanel14 = new javax.swing.JPanel();
+        jLabel13 = new javax.swing.JLabel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        listBan = new javax.swing.JTable();
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane7.setViewportView(jTable1);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setType(java.awt.Window.Type.POPUP);
@@ -152,11 +180,11 @@ public class MainViews extends javax.swing.JFrame {
             }
         });
 
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-setting-35.png"))); // NOI18N
-        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+        setting.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        setting.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-setting-35.png"))); // NOI18N
+        setting.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel2MouseClicked(evt);
+                settingMouseClicked(evt);
             }
         });
 
@@ -176,11 +204,19 @@ public class MainViews extends javax.swing.JFrame {
             }
         });
 
-        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-log-out-35.png"))); // NOI18N
-        jLabel7.addMouseListener(new java.awt.event.MouseAdapter() {
+        logout.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        logout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-log-out-35.png"))); // NOI18N
+        logout.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel7MouseClicked(evt);
+                logoutMouseClicked(evt);
+            }
+        });
+
+        admin.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        admin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-admin-35.png"))); // NOI18N
+        admin.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                adminMouseClicked(evt);
             }
         });
 
@@ -189,10 +225,11 @@ public class MainViews extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(setting, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(logout, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(admin, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -203,10 +240,12 @@ public class MainViews extends javax.swing.JFrame {
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(13, 13, 13)
                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 212, Short.MAX_VALUE)
-                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(setting, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(admin, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 165, Short.MAX_VALUE)
+                .addComponent(logout, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -227,14 +266,14 @@ public class MainViews extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(272, 272, 272)
                 .addComponent(jLabel5)
-                .addContainerGap(367, Short.MAX_VALUE))
+                .addContainerGap(343, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(47, 47, 47)
                 .addComponent(jLabel5)
-                .addContainerGap(99, Short.MAX_VALUE))
+                .addContainerGap(105, Short.MAX_VALUE))
         );
 
         PanelDisplay.addTab("tab1", jPanel1);
@@ -295,14 +334,6 @@ public class MainViews extends javax.swing.JFrame {
 
         jLabel9.setText("Thông báo");
 
-        reloadBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-reload-20.png"))); // NOI18N
-        reloadBtn.setBorder(null);
-        reloadBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                reloadBtnActionPerformed(evt);
-            }
-        });
-
         txtnote.setEditable(false);
         txtnote.setColumns(20);
         txtnote.setRows(5);
@@ -338,12 +369,9 @@ public class MainViews extends javax.swing.JFrame {
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel11)
-                            .addComponent(jLabel9))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(reloadBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel7Layout.setVerticalGroup(
@@ -352,10 +380,8 @@ public class MainViews extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel8)
-                    .addComponent(reloadBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(4, 4, 4)
+                .addComponent(jLabel8)
+                .addGap(13, 13, 13)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel11)
@@ -365,7 +391,7 @@ public class MainViews extends javax.swing.JFrame {
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addContainerGap(47, Short.MAX_VALUE))
         );
 
         jPanel5.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(28, 16, -1, 610));
@@ -554,7 +580,7 @@ public class MainViews extends javax.swing.JFrame {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 1139, Short.MAX_VALUE)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 1115, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -758,7 +784,7 @@ public class MainViews extends javax.swing.JFrame {
                     .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jScrollPane6)))
-                .addContainerGap(34, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -794,6 +820,77 @@ public class MainViews extends javax.swing.JFrame {
 
         PanelDisplay.addTab("tab3", jPanel4);
 
+        jPanel14.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel14.setMinimumSize(new java.awt.Dimension(1051, 646));
+        jPanel14.setPreferredSize(new java.awt.Dimension(1051, 646));
+
+        jLabel13.setFont(new java.awt.Font("Tahoma", 0, 25)); // NOI18N
+        jLabel13.setText("Danh Sách Bị Chặn");
+        jLabel13.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
+
+        listBan.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        listBan.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Username", "Password", "Ngày Sinh", "Giới Tính "
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        listBan.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                listBanMouseClicked(evt);
+            }
+        });
+        jScrollPane8.setViewportView(listBan);
+        if (listBan.getColumnModel().getColumnCount() > 0) {
+            listBan.getColumnModel().getColumn(0).setResizable(false);
+            listBan.getColumnModel().getColumn(1).setResizable(false);
+            listBan.getColumnModel().getColumn(2).setResizable(false);
+            listBan.getColumnModel().getColumn(3).setResizable(false);
+        }
+
+        javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
+        jPanel14.setLayout(jPanel14Layout);
+        jPanel14Layout.setHorizontalGroup(
+            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel14Layout.createSequentialGroup()
+                .addContainerGap(132, Short.MAX_VALUE)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 866, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(117, 117, 117))
+        );
+        jPanel14Layout.setVerticalGroup(
+            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel14Layout.createSequentialGroup()
+                .addGap(29, 29, 29)
+                .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(58, 58, 58)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 383, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
+        jPanel13.setLayout(jPanel13Layout);
+        jPanel13Layout.setHorizontalGroup(
+            jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, 1115, Short.MAX_VALUE)
+        );
+        jPanel13Layout.setVerticalGroup(
+            jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
+        );
+
+        PanelDisplay.addTab("tab4", jPanel13);
+
         getContentPane().add(PanelDisplay, new org.netbeans.lib.awtextra.AbsoluteConstraints(67, -31, -1, 680));
 
         pack();
@@ -803,16 +900,6 @@ public class MainViews extends javax.swing.JFrame {
         PanelDisplay.setSelectedIndex(1);
         displayMessage.setText("");
         userSend.setText("None");
-        try {
-            in = new DataInputStream(socket.getInputStream());
-            out = new DataOutputStream(socket.getOutputStream());
-            out.writeUTF("handle_request2");
-            out.writeUTF(username);
-            String opt = "get_user_online";
-            out.writeUTF(opt);
-        } catch (IOException ex) {
-            Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }//GEN-LAST:event_jLabel1MouseClicked
 
 //Call form main
@@ -884,7 +971,7 @@ public class MainViews extends javax.swing.JFrame {
         String curdate = date.format(formatter);
         return curdate;
     }
-    private void jLabel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseClicked
+    private void logoutMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_logoutMouseClicked
         int ask = JOptionPane.showConfirmDialog(this, "Do you want log out ?");
         if (ask == 0) {
             String opt = "user_out";
@@ -897,16 +984,7 @@ public class MainViews extends javax.swing.JFrame {
                 Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-    }//GEN-LAST:event_jLabel7MouseClicked
-
-    private void reloadBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadBtnActionPerformed
-        try {
-            out = new DataOutputStream(socket.getOutputStream());
-            out.writeUTF("get_user_online");
-        } catch (IOException ex) {
-            Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_reloadBtnActionPerformed
+    }//GEN-LAST:event_logoutMouseClicked
     public static int accept = -1;
     private void addFriendBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addFriendBTNActionPerformed
         try {
@@ -1241,7 +1319,7 @@ public class MainViews extends javax.swing.JFrame {
 
     private void stickerGroup4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_stickerGroup4MouseClicked
         // TODO add your handling code here:
-         try {
+        try {
             out = new DataOutputStream(socket.getOutputStream());
         } catch (IOException ex) {
             Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
@@ -1400,7 +1478,7 @@ public class MainViews extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         try {
             // TODO add your handling code here:
-            if (nameofgroup.getText().equals("NAME OF GROUP")){
+            if (nameofgroup.getText().equals("NAME OF GROUP")) {
                 JOptionPane.showMessageDialog(null, "Vui lòng chọn nhóm để thoát");
             }
             out = new DataOutputStream(socket.getOutputStream());
@@ -1410,13 +1488,13 @@ public class MainViews extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
             // TODO add your handling code here:
-            if (nameofgroup.getText().equals("NAME OF GROUP")){
+            if (nameofgroup.getText().equals("NAME OF GROUP")) {
                 JOptionPane.showMessageDialog(null, "Vui lòng chọn nhóm để chặn");
             }
             out = new DataOutputStream(socket.getOutputStream());
@@ -1426,12 +1504,43 @@ public class MainViews extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+    private void settingMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_settingMouseClicked
         // TODO add your handling code here:
-    }//GEN-LAST:event_jLabel2MouseClicked
+        ChangePasswordViews cpv = new ChangePasswordViews(username, socket);
+        cpv.setVisible(true);
+    }//GEN-LAST:event_settingMouseClicked
+
+    private void adminMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_adminMouseClicked
+        // TODO add your handling code here:
+        PanelDisplay.setSelectedIndex(3);
+        try {
+            out = new DataOutputStream(socket.getOutputStream());
+            out.writeUTF("list_user_ban");
+        } catch (IOException ex) {
+            Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_adminMouseClicked
+
+    private void listBanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listBanMouseClicked
+        // TODO add your handling code here:
+        int userChose = listBan.getSelectedRow();
+        TableModel getUserChoseBan = listBan.getModel();
+        String userUnBan = (String) getUserChoseBan.getValueAt(userChose, 0);
+        int quest = JOptionPane.showConfirmDialog(null, "Bạn có muốn bỏ án phạt cho " + userUnBan + " không ?");
+        if (quest == 0) {
+            try {
+                out = new DataOutputStream(socket.getOutputStream());
+                out.writeUTF("unban");
+                out.writeUTF(userUnBan);
+            } catch (IOException ex) {
+                Logger.getLogger(MainViews.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+    }//GEN-LAST:event_listBanMouseClicked
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -1471,10 +1580,11 @@ public class MainViews extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTabbedPane PanelDisplay;
+    public static javax.swing.JTabbedPane PanelDisplay;
     private javax.swing.JPanel PanelSticker;
     private javax.swing.JPanel PanelSticker1;
     private javax.swing.JButton addFriendBTN;
+    public static javax.swing.JLabel admin;
     private javax.swing.JButton blockBTN;
     private javax.swing.JFileChooser choseFile;
     public static javax.swing.JTextPane displayMessage;
@@ -1482,23 +1592,24 @@ public class MainViews extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton5;
-    private javax.swing.JLabel jLabel1;
+    public static javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
+    public static javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     public static javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -1513,14 +1624,19 @@ public class MainViews extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JTable jTable1;
+    public static javax.swing.JTable listBan;
     public static javax.swing.JList<String> listFriend;
     public static javax.swing.JList<String> listGroup;
+    private javax.swing.JLabel logout;
     public static javax.swing.JLabel nameofgroup;
-    private javax.swing.JButton reloadBtn;
     private javax.swing.JButton sendFile;
     private javax.swing.JButton sendFileGroup;
     private javax.swing.JButton sendGroup;
     private javax.swing.JButton sendMessage;
+    public static javax.swing.JLabel setting;
     private javax.swing.JLabel sticker1;
     private javax.swing.JLabel sticker2;
     private javax.swing.JLabel sticker3;

@@ -33,6 +33,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -70,10 +71,22 @@ public class ClientsControls {
                     if (client.isConnected()) {
                         String choice = in.readUTF();
                         switch (choice) {
+                            case "is_admin":
+                                int isAdmin = in.readInt();
+                                System.out.println(isAdmin);
+                                if (isAdmin == 1) {
+                                    MainViews.admin.setVisible(true);
+                                } else {
+                                    MainViews.admin.setVisible(false);
+                                }
+                                break;
                             case "banned":
                                 String getMessBan = in.readUTF();
                                 JOptionPane.showMessageDialog(null, getMessBan);
-                                System.exit(0);
+                                MainViews.PanelDisplay.setSelectedIndex(0);
+                                MainViews.jLabel1.setVisible(false);
+                                MainViews.jLabel4.setVisible(false);
+                                MainViews.setting.setVisible(false);
                                 break;
                             case "broad_cast":
                                 String messBroad = in.readUTF();
@@ -93,6 +106,52 @@ public class ClientsControls {
                                     MainViews.displayMessage.setForeground(Color.blue);
                                 } else {
                                     thongBao.append(notemess + "\n");
+                                }
+                                break;
+                            case "unban":
+                                int isUnBaned = in.readInt();
+                                String getUserUnBan = in.readUTF();
+                                if (isUnBaned == 1){
+                                    JOptionPane.showMessageDialog(null,"Đã xóa án phạt thành công cho " + getUserUnBan);
+                                    out.writeUTF("list_user_ban");
+                                }else {
+                                    JOptionPane.showMessageDialog(null,"Có lỗi xảy ra trong quá trình xóa án phạt cho " + getUserUnBan);
+                                }
+                                break;
+                            case "display_ban_user":
+                                int sizeOfBanList = in.readInt();
+                                DefaultTableModel listUBan = (DefaultTableModel) MainViews.listBan.getModel();
+                                listUBan.setNumRows(0);
+                                if (sizeOfBanList != 0) {
+                                    while (sizeOfBanList > 0) {
+                                        String tempFull = in.readUTF();
+                                        String[] fullTable = tempFull.split(" ");
+                                        char[] a = tempFull.toCharArray();
+                                        int spaces = 0;
+                                        String getDateBanU = "";
+                                        for (int i = a.length - 1; i >= 0; i--) {
+                                            if (a[i] == ' ' && spaces <= 2) {
+                                                getDateBanU += a[i];
+                                                spaces++;
+                                            } else if (a[i] == ' ' && spaces > 2) {
+                                                break;
+                                            } else {
+                                                getDateBanU += a[i];
+                                            }
+                                        }
+                                        System.out.println(getDateBanU);
+                                        String reverse= new StringBuilder(getDateBanU).reverse().toString();
+                                        String nameOfUserBan = fullTable[0];
+                                        String passOfUser = fullTable[1];
+                                        String ngaySinh = reverse;
+                                        String gioiTinh = fullTable[2];
+                                        String[] obj = {nameOfUserBan, passOfUser, ngaySinh, gioiTinh};
+                                        listUBan.addRow(obj);
+                                        sizeOfBanList--;
+                                        if (sizeOfBanList == 0){
+                                            break;
+                                        }
+                                    }
                                 }
                                 break;
                             case "receive_msg_group":
@@ -208,8 +267,8 @@ public class ClientsControls {
                                 String groupHasJoined = in.readUTF();
                                 JOptionPane.showMessageDialog(null, "Bạn đã tham gia nhóm " + groupHasJoined);
                                 out.writeUTF("send_old_message_group");
-                                out.writeUTF(username);
                                 out.writeUTF(groupHasJoined);
+                                out.writeUTF(username);
                                 MainViews.nameofgroup.setText(groupHasJoined);
                                 MainViews.currentChatWith = groupHasJoined;
                                 break;
@@ -281,8 +340,8 @@ public class ClientsControls {
                                             String sendFile = user + ": <a href='" + urls + "'>" + filesaveG.getName() + "</a>" + "<br>" + timesend + "<br>";
                                             HTMLDocument document = (HTMLDocument) MainViews.displayMessageGroup.getDocument();
                                             document.insertAfterEnd(document.getCharacterElement(document.getLength()), sendFile);
-                                            MainViews.displayMessageGroup.setForeground(Color.blue);
                                             MainViews.displayMessageGroup.addHyperlinkListener(new MyHyperLinkControls());
+                                            MainViews.displayMessageGroup.setForeground(Color.blue);
                                         } else if (message.contains("[IMAGE]")) {
                                             MainViews.displayMessageGroup.setContentType("text/html");
                                             String startW = "[IMAGE]";
@@ -326,8 +385,8 @@ public class ClientsControls {
                                     String sendFile = username + ": <a href='" + url + "'>" + filename + "</a>" + "<br>" + curdat + "<br>";
                                     HTMLDocument doc = (HTMLDocument) MainViews.displayMessage.getDocument();
                                     doc.insertAfterEnd(doc.getCharacterElement(doc.getLength()), sendFile);
-                                    MainViews.displayMessage.setForeground(Color.blue);
                                     MainViews.displayMessage.addHyperlinkListener(new MyHyperLinkControls());
+                                    MainViews.displayMessage.setForeground(Color.blue);
                                 } else {
                                     thongBao.append(note + "\n");
                                 }
@@ -394,13 +453,22 @@ public class ClientsControls {
                                     MainViews.displayMessage.setText("");
                                 }
                                 break;
+                            case "update_group":
+                                int numberOfGroupUpdate = in.readInt();
+                                DefaultListModel dlmUp = new DefaultListModel();
+                                for (int i = 0; i < numberOfGroupUpdate; i++) {
+                                    dlmUp.addElement(in.readUTF());
+                                }
+                                MainViews.listGroup.setModel(dlmUp);
+                                break;
                             case "check_block_or_not":
                                 int resl = in.readInt();
                                 if (resl == 1) {
                                     JOptionPane.showMessageDialog(null, "Người dùng không khả dụng");
                                 } else {
-                                    MainViews.userSend.setText(MainViews.userOnline.getSelectedValue());
-                                    MainViews.currentChatWith = MainViews.userOnline.getSelectedValue();
+                                    String userCanChat = in.readUTF();
+                                    MainViews.userSend.setText(userCanChat);
+                                    MainViews.currentChatWith = userCanChat;
                                     out.writeUTF("send_old_message");
                                     out.writeUTF(userSend.getText());
                                     out.writeUTF(MainViews.username);
@@ -409,6 +477,7 @@ public class ClientsControls {
                                 break;
                             case "display_group":
                                 int isSize = in.readInt();
+                                System.out.println("THIS IS DISPLAY GROUP");
                                 DefaultListModel displayGroup = new DefaultListModel();
                                 for (int i = 0; i < isSize; i++) {
                                     displayGroup.addElement(in.readUTF());
@@ -441,6 +510,14 @@ public class ClientsControls {
                                 break;
                             case "get_noti":
                                 MainViews.txtnote.append(in.readUTF() + "\n");
+                                break;
+                            case "change_password":
+                                int changed = in.readInt();
+                                if (changed == 1) {
+                                    JOptionPane.showMessageDialog(null, "Đã thay đổi password thành công !");
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "Có lỗi xảy ra trong quá trình thay đổi !");
+                                }
                                 break;
                         }
                     } else {

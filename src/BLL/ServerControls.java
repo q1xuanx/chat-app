@@ -48,9 +48,11 @@ public class ServerControls {
         sv = new ServerSocket(7777);
         System.out.println("Create server at " + sv.getLocalPort());
         System.out.println("Server start");
+        ServerService ss = new ServerService();
+        Thread t1 = new Thread(ss);
+        t1.start();
         mp = new HashMap<>();
         while (true) {
-            System.out.println("Waiting for client...");
             Socket client = sv.accept();
             in = new DataInputStream(client.getInputStream());
             out = new DataOutputStream(client.getOutputStream());
@@ -59,9 +61,6 @@ public class ServerControls {
             HandleClient hc = new HandleClient(client, in, out);
             Thread t = new Thread(hc);
             t.start();
-            ServerService ss = new ServerService();
-            Thread t1 = new Thread(ss);
-            t1.start();
         }
     }
 
@@ -95,6 +94,13 @@ public class ServerControls {
                                     System.out.println("[LOG] " + email + " đã đăng nhập");
                                 }
                                 break;
+                            case "is_admin":
+                                String userIsAdmin = in.readUTF();
+                                UserControls usercontrols = new UserControls();
+                                int isAdmin = usercontrols.isAdmin(userIsAdmin);
+                                out.writeUTF("is_admin");
+                                out.writeInt(isAdmin);
+                                break;
                             case "sign_up":
                                 RegisterControls regis = new RegisterControls();
                                 email = in.readUTF();
@@ -107,6 +113,21 @@ public class ServerControls {
                                 if (checkSign == 1) {
                                     System.out.println("[LOG] Chào mừng thành viên mới: " + email);
                                 }
+                                break;
+                            case "user_online":
+                                DataOutputStream tempOut = out;
+                                for (Map.Entry<String, Socket> mapp : mp.entrySet()) {
+                                    if (!mapp.getKey().equals(username)) {
+                                        out = new DataOutputStream(mapp.getValue().getOutputStream());
+                                        out.writeUTF("get_user_online");
+                                        int sizeOfMapUpdate = mp.size();
+                                        out.writeUTF(String.valueOf(sizeOfMapUpdate));
+                                        for (Map.Entry<String, Socket> m : mp.entrySet()) {
+                                            out.writeUTF(m.getKey());
+                                        }
+                                    }
+                                }
+                                out = tempOut;
                                 break;
                             case "send_message":
                                 String userToSend = in.readUTF();
@@ -132,6 +153,29 @@ public class ServerControls {
                                 System.out.println("[LOG] " + userToSend + " đã gửi tin nhắn đến " + userSend);
                                 sendMessage(msg, userSend, temp, curdate);
                                 break;
+                            case "list_user_ban":
+                                UserControls listBan = new UserControls();
+                                ResultSet listUBan = listBan.getUserBan();
+                                ArrayList<String> getSize = new ArrayList<String>();
+                                while (listUBan.next()) {
+                                    String fulltable = listUBan.getString(1) + " " + listUBan.getString(2) + " " + listUBan.getString(3) + " " + listUBan.getString(4);
+                                    getSize.add(fulltable);
+                                }
+                                out.writeUTF("display_ban_user");
+                                out.writeInt(getSize.size());
+                                if (!getSize.isEmpty()) {
+                                    for (int i = 0; i < getSize.size(); i++) {
+                                        out.writeUTF(getSize.get(i));
+                                    }
+                                }
+                                break;
+                            case "unban":
+                                String getUserUnBan = in.readUTF();
+                                UserControls userUnBan = new UserControls();
+                                out.writeUTF("unban");
+                                out.writeInt(userUnBan.UnBan(getUserUnBan));
+                                out.writeUTF(getUserUnBan);
+                                break;
                             case "get_user_online":
                                 String action = "get_user_online";
                                 out.writeUTF(action);
@@ -156,6 +200,25 @@ public class ServerControls {
                                 out = new DataOutputStream(getOut.getOutputStream());
                                 out.writeUTF("kill_thread");
                                 mp.remove(username);
+                                for (Map.Entry<String, Socket> mapp : mp.entrySet()) {
+                                    if (!mapp.getKey().equals(username)) {
+                                        DataOutputStream outUser = new DataOutputStream(mapp.getValue().getOutputStream());
+                                        outUser.writeUTF("get_user_online");
+                                        int sizeOfMapUpdate = mp.size();
+                                        outUser.writeUTF(String.valueOf(sizeOfMapUpdate));
+                                        for (Map.Entry<String, Socket> m : mp.entrySet()) {
+                                            outUser.writeUTF(m.getKey());
+                                        }
+                                    }
+                                }
+                                FriendControls fccUp = new FriendControls();
+                                ResultSet resUp = fccUp.displayFriend(username);
+                                while (resUp.next()) {
+                                    Socket getNoti = mp.get(resUp.getString(1));
+                                    if (getNoti != null) {
+                                        sendNotification("get_noti", "[BẠN BÈ] " + username + " đã offline ", getNoti);
+                                    }
+                                }
                                 break;
                             case "send_request_friend":
                                 String userNeedToSend = in.readUTF();
@@ -358,17 +421,17 @@ public class ServerControls {
                                     Socket updateFr1 = null;
                                     Socket updateFr2 = null;
                                     int rmvfr1 = rmvFriend.RmvFriend(userSendBlock, userBlock);
-                                    int rmvfr2 = rmvFriend.RmvFriend(userBlock, userSendBlock);    
+                                    int rmvfr2 = rmvFriend.RmvFriend(userBlock, userSendBlock);
                                     updateFr1 = mp.get(userSendBlock);
                                     updateFr2 = mp.get(userBlock);
-                                    if (updateFr1 != null && rmvfr1 == 1){
-                                        displayFriendList("handle_request1",updateFr1,userSendBlock);
+                                    if (updateFr1 != null && rmvfr1 == 1) {
+                                        displayFriendList("handle_request1", updateFr1, userSendBlock);
                                     }
-                                    if (updateFr2 != null && rmvfr2 == 1){
-                                        displayFriendList("handle_request1",updateFr2,userBlock);
+                                    if (updateFr2 != null && rmvfr2 == 1) {
+                                        displayFriendList("handle_request1", updateFr2, userBlock);
                                     }
                                     if (mp.get(userBlock) != null) {
-                                        block = mp.get(userBlock);                                 
+                                        block = mp.get(userBlock);
                                         sendBlockAct("user_blocked", block, userSendBlock);
                                     }
                                 }
@@ -379,7 +442,7 @@ public class ServerControls {
                             case "check_block_or_not":
                                 String userNeed = in.readUTF();
                                 String userCheck = in.readUTF();
-                                System.out.println(userNeed + " " + userCheck);
+                                System.out.println(userNeed + userCheck);
                                 BlockControls bc = new BlockControls();
                                 ResultSet checkBlock = bc.checkBlock(userNeed, userCheck);
                                 String revac = "check_block_or_not";
@@ -388,6 +451,7 @@ public class ServerControls {
                                     out.writeInt(1);
                                 } else {
                                     out.writeInt(0);
+                                    out.writeUTF(userNeed);
                                 }
                                 break;
                             case "create_group":
@@ -422,6 +486,16 @@ public class ServerControls {
                                         out.writeUTF(groupAvai.get(i));
                                     }
                                     System.out.println("[LOG] " + userCreate + " đã tạo nhóm " + groupName);
+                                    for (Map.Entry<String, Socket> updateGroup : mp.entrySet()) {
+                                        if (!updateGroup.getKey().equals(userCreate)) {
+                                            DataOutputStream tempUpdate = new DataOutputStream(updateGroup.getValue().getOutputStream());
+                                            tempUpdate.writeUTF("update_group");
+                                            tempUpdate.writeInt(groupAvai.size());
+                                            for (int i = 0; i < groupAvai.size(); i++) {
+                                                tempUpdate.writeUTF(groupAvai.get(i));
+                                            }
+                                        }
+                                    }
                                 } else {
                                     out.writeUTF("Xảy ra lỗi khi tạo nhóm");
                                 }
@@ -456,6 +530,7 @@ public class ServerControls {
                                 String newMem = in.readUTF();
                                 String nameGroupJoin = in.readUTF();
                                 String idToAdd = in.readUTF();
+                                System.out.println(idToAdd);
                                 GroupControls gcsl = new GroupControls();
                                 int addsuccess = gcsl.addMember(newMem, idToAdd);
                                 if (addsuccess == 1) {
@@ -579,6 +654,17 @@ public class ServerControls {
                                         sendNotification("get_noti", "[BẠN BÈ] " + userLoad + " đã online ", getNoti);
                                     }
                                 }
+                                break;
+                            case "change_password":
+                                String getUserChange = in.readUTF();
+                                String getNewPass = in.readUTF();
+                                ListUserModels changePass = new ListUserModels();
+                                int changed = changePass.changePass(getUserChange, getNewPass);
+                                if (changed == 1) {
+                                    System.out.println("[LOG] " + getUserChange + " đã thay đổi mật khẩu");
+                                }
+                                out.writeUTF("change_password");
+                                out.writeInt(changed);
                                 break;
                             default:
 
@@ -713,7 +799,8 @@ public class ServerControls {
             while (true) {
                 Scanner sc = new Scanner(System.in);
                 System.out.println("-help for list command");
-                String choice = sc.nextLine();
+                String choice = sc.next();
+                sc.nextLine();
                 switch (choice) {
                     case "-help":
                         System.out.println("-userlist: Liệt kê danh sách user online và tổng user");

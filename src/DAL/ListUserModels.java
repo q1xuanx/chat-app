@@ -35,4 +35,24 @@ public class ListUserModels {
         String q = "exec rmvFriend '"+username1+"', '"+username2+"'";
         return db.UpdateTable(q);
     }
+    public int changePass(String username, String pass) throws ClassNotFoundException, SQLException{
+        DBAccess db = new DBAccess();
+        String q = "exec ChangPass '"+username+"', '"+pass+"'";
+        return db.UpdateTable(q);
+    }
+    public ResultSet isAdmin(String username) throws ClassNotFoundException, SQLException{
+        DBAccess db = new DBAccess();
+        String q = "exec isAdmin '"+username+"'";
+        return db.ExQuery(q);
+    }
+    public ResultSet displayBanUser() throws ClassNotFoundException, SQLException{
+        DBAccess db = new DBAccess();
+        String q = "exec getUserBan";
+        return db.ExQuery(q);
+    }
+    public int UnBan(String username) throws ClassNotFoundException, SQLException{
+        DBAccess db = new DBAccess();
+        String q = "exec unBan '"+username+"'";
+        return db.UpdateTable(q);
+    }
 }

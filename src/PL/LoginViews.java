@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -35,7 +36,7 @@ public class LoginViews extends javax.swing.JFrame {
 
     public LoginViews() throws IOException {
         initComponents();
-        this.setLocationRelativeTo(null); 
+        this.setLocationRelativeTo(null);
         client = new Socket("localhost", 7777);
         in = new DataInputStream(client.getInputStream());
         out = new DataOutputStream(client.getOutputStream());
@@ -252,9 +253,44 @@ public class LoginViews extends javax.swing.JFrame {
             out.writeUTF(hash);
             boolean check = in.readBoolean();
             if (check == true) {
-                MainViews mv = new MainViews(client, txtusername.getText());
-                mv.setVisible(true);
+                LoadingViews lv = new LoadingViews();
                 this.hide();
+                lv.setVisible(true);
+                Thread loadingThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i <= 100; i++) {
+                            try {
+                                Thread.sleep(5);
+                                int progress = i;
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        lv.jLabel2.setText(String.valueOf(progress) + "%");
+                                        lv.jProgressBar1.setValue(progress);
+                                        if (progress == 100) {
+                                            lv.setVisible(false);
+                                        }
+                                    }
+                                });
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(LoginViews.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    MainViews mv = new MainViews(client, txtusername.getText());
+                                    mv.setVisible(true);
+                                } catch (IOException ex) {
+                                    Logger.getLogger(LoginViews.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
+                        });
+                    }
+                });
+                loadingThread.start();
             } else {
                 JOptionPane.showMessageDialog(this, "Sai tên tài khoản hoặc mật khẩu");
             }
@@ -303,7 +339,6 @@ public class LoginViews extends javax.swing.JFrame {
             }
         });
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;

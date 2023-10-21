@@ -25,6 +25,7 @@ public class CreateGroupViews extends javax.swing.JFrame {
     private static String username;
     public CreateGroupViews(Socket s, String username) throws IOException {
         initComponents();
+        this.setLocationRelativeTo(null);
         this.s = s;
         this.username = username;
         DataOutputStream out = new DataOutputStream(s.getOutputStream());
@@ -93,9 +94,9 @@ public class CreateGroupViews extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtnamegroup))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(33, 33, 33)
+                        .addGap(21, 21, 21)
                         .addComponent(createGroup)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(18, 18, 18)
                         .addComponent(jButton1)
                         .addGap(0, 18, Short.MAX_VALUE)))
                 .addContainerGap())
