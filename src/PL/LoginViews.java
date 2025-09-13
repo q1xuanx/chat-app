@@ -252,9 +252,9 @@ public class LoginViews extends javax.swing.JFrame {
             out.writeUTF(txtusername.getText());
             out.writeUTF(hash);
             boolean check = in.readBoolean();
-            if (check == true) {
+            if (check) {
                 LoadingViews lv = new LoadingViews();
-                this.hide();
+                this.dispose();
                 lv.setVisible(true);
                 Thread loadingThread = new Thread(new Runnable() {
                     @Override
